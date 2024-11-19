@@ -5,3 +5,4 @@
 - [X] Melisa Rossi
 - [X] Katia Berrios
 - [X] Roberto Gil
+- [ ] Luz Angela
