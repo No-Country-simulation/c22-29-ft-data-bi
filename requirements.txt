@@ -7,3 +7,4 @@ ipykernel
 python-decouple
 SQLAlchemy
 PyMySQL
+mysql-connector-python
