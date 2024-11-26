@@ -1,0 +1,238 @@
+---
+title: "c22-29-ft-data-bi"
+lang: "es"
+execute:
+  echo: false
+  output: false
+---
+
+# EDA
+
+```{python}
+import os
+os.cpu_count()
+```
+
+```{python}
+%pip install -r requirements.txt
+# por si no anda este descomentar el de abajo
+#!pip install -r requirements.txt
+```
+
+```{python}
+import numpy as np
+import pandas as pd
+import pyprojroot
+```
+
+```{python}
+data_path = pyprojroot.here('inventory-analysis-case-study')
+
+beg_inv = pd.read_csv(data_path.joinpath('BegInvFINAL12312016.csv'))
+end_inv = pd.read_csv(data_path.joinpath('EndInvFINAL12312016.csv'))
+sales = pd.read_csv(data_path.joinpath('SalesFINAL12312016.csv'))
+purchases = pd.read_csv(data_path.joinpath('PurchasesFINAL12312016.csv'))
+invoice_purchases = pd.read_csv(
+    data_path.joinpath('InvoicePurchases12312016.csv'))
+purchase_prices = pd.read_csv(data_path.joinpath('2017PurchasePricesDec.csv'))
+```
+
+```{python}
+purchase_prices.info()
+```
+
+```{python}
+len(purchase_prices.VendorName.unique())
+```
+
+## Inventario Inicial
+
+```{python}
+beg_inv.info()
+```
+
+```{python}
+len(beg_inv.InventoryId.unique())
+```
+
+```{python}
+beg_inv.sample(3)
+```
+
+```{python}
+print(len(beg_inv.InventoryId.unique()))
+print(len(beg_inv.Store.unique()))
+print(len(beg_inv.Brand.unique()))
+```
+
+## Inventario Final
+
+```{python}
+end_inv.info()
+```
+
+```{python}
+len(end_inv.InventoryId.unique())
+```
+
+```{python}
+coincidencias_booleanas = (
+    end_inv['InventoryId']
+    .isin(beg_inv['InventoryId'])
+)
+cantidad_coincidencias = coincidencias_booleanas.sum()
+cantidad_coincidencias
+```
+
+```{python}
+print(len(end_inv.InventoryId.unique()))
+print(len(end_inv.Store.unique()))
+print(len(end_inv.Brand.unique()))
+```
+
+```{python}
+unique_end_inv = end_inv['Store'].unique()
+unique_beg_inv = beg_inv['Store'].unique()
+
+# Usar 'isin' sobre las series de valores únicos
+coincidencias_booleanas = pd.Series(unique_end_inv).isin(unique_beg_inv)
+
+# Contar cuántas coincidencias hay
+coincidencias_booleanas = coincidencias_booleanas.sum()
+coincidencias_booleanas
+```
+
+```{python}
+unique_end_inv = end_inv['Brand'].unique()
+unique_beg_inv = beg_inv['Brand'].unique()
+
+# Usar 'isin' sobre las series de valores únicos
+coincidencias_booleanas = pd.Series(unique_end_inv).isin(unique_beg_inv)
+
+# Contar cuántas coincidencias hay
+cantidad_coincidencias = coincidencias_booleanas.sum()
+cantidad_coincidencias
+```
+
+## Sales
+
+```{python}
+sales.info()
+```
+
+```{python}
+len(sales.InventoryId.unique())
+```
+
+
+## invoice_purchases 
+
+```{python}
+invoice_purchases.info()
+```
+
+```{python}
+len(invoice_purchases.VendorNumber.unique())
+# 126
+```
+
+```{python}
+len(invoice_purchases.VendorName.unique())
+#129
+```
+
+```{python}
+invoice_purchases.sample(3)
+```
+
+```{python}
+invoice_purchases.VendorName.value_counts()
+```
+
+```{python}
+# 2000
+# 1587
+invoice_purchases.query('VendorNumber == 1587')
+```
+```{python}
+invoice_purchases.query('VendorNumber == 2000').VendorName.value_counts()
+```
+```{python}
+invoice_purchases.query('VendorName == "VINEYARD BRANDS LLC"')
+```
+```{python}
+invoice_purchases.query('VendorNumber == 1587').VendorName.value_counts()
+```
+```{python}
+invoice_purchases.VendorNumber.value_counts()
+```
+```{python}
+invoice_purchases['VendorName'] = invoice_purchases['VendorName'].str.strip()
+```
+
+```{python}
+invoice_purchases.query('VendorNumber == 8112')
+```
+
+```{python}
+invoice_purchases.Approval.sample(3)
+```
+
+```{python}
+len(invoice_purchases.Approval.unique())
+invoice_purchases.Approval.value_counts()
+```
+
+```{python}
+#buscando = invoice_purchases[invoice_purchases.apply(lambda row: row.astype(str).str.contains("Frank Delahunt").any(), axis=1)]
+invoice_purchases.sample(3)
+```
+
+```{python}
+invoice_purchases['Approval'] = invoice_purchases['Approval'].notna().astype(int)
+```
+
+## Purchases
+
+```{python}
+purchases.info()
+```
+
+```{python}
+print(len(purchases.InventoryId.unique()))
+print(len(purchases.Store.unique()))
+print(len(purchases.Brand.unique()))
+```
+
+```{python}
+purchases.sample(3)
+```
+
+```{python}
+purchases.query('VendorNumber == 8112')
+```
+
+# Otro
+```{python}
+sales.sample(3)
+```
+
+```{python}
+sales.query('VendorNo == 8112')
+```
+
+```{python}
+len(sales.VendorNo.unique())
+```
+
+```{python}
+unique_end_inv = sales['VendorNo'].unique()
+unique_beg_inv = invoice_purchases['VendorNumber'].unique()
+
+# Usar 'isin' sobre las series de valores únicos.unique_end_inv
+coincidencias_booleanas = pd.Series(unique_beg_inv).isin(unique_end_inv)
+
+# Contar cuántas coincidencias hay
+cantidad_coincidencias = coincidencias_booleanas.sum()
+cantidad_coincidencias
+```
