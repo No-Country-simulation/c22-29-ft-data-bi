@@ -45,6 +45,10 @@ purchase_prices.info()
 len(purchase_prices.VendorName.unique())
 ```
 
+```{python}
+purchase_prices.sample(3)
+```
+
 ## Inventario Inicial
 
 ```{python}
@@ -124,8 +128,31 @@ sales.info()
 len(sales.InventoryId.unique())
 ```
 
+```{python}
+vendor_sales_unicos = sales[['VendorNo', 'VendorName']] \
+    .drop_duplicates() \
+    .sort_values('VendorNo') \
+    .reset_index(drop=True)
 
-## invoice_purchases 
+vendor_sales_unicos['VendorName'] = vendor_sales_unicos['VendorName'].str.strip()
+
+print(len(vendor_sales_unicos.VendorNo.unique()))
+print(len(vendor_sales_unicos.VendorName.unique()))
+```
+
+```{python}
+vendor_sales_unicos.query('VendorNo == 2000').VendorName.value_counts()
+```
+
+```{python}
+vendor_sales_unicos.query('VendorNo == 1587').VendorName.value_counts()
+```
+
+```{python}
+vendor_sales_unicos.query('VendorNo == 4425').VendorName.value_counts()
+```
+
+## Invoice purchases 
 
 ```{python}
 invoice_purchases.info()
@@ -184,12 +211,31 @@ invoice_purchases.Approval.value_counts()
 ```
 
 ```{python}
-#buscando = invoice_purchases[invoice_purchases.apply(lambda row: row.astype(str).str.contains("Frank Delahunt").any(), axis=1)]
+buscando = invoice_purchases[invoice_purchases.apply(lambda row: row.astype(str).str.contains("Frank Delahunt").any(), axis=1)]
 invoice_purchases.sample(3)
 ```
 
 ```{python}
 invoice_purchases['Approval'] = invoice_purchases['Approval'].notna().astype(int)
+```
+
+```{python}
+valores_unicos = invoice_purchases[['VendorNumber', 'VendorName']] \
+    .drop_duplicates() \
+    .sort_values('VendorNumber') \
+    .reset_index(drop=True)
+
+valores_unicos['VendorName'] = valores_unicos['VendorName'].str.strip()
+```
+
+```{python}
+print(len(valores_unicos.VendorNumber.unique()))
+print(len(valores_unicos.VendorName.unique()))
+```
+
+```{python}
+valores_unicos.query('VendorNumber == 1587')
+#valores_unicos.head(8)
 ```
 
 ## Purchases
@@ -212,27 +258,45 @@ purchases.sample(3)
 purchases.query('VendorNumber == 8112')
 ```
 
+```{python}
+vendor_purchases_unicos = purchases[['VendorNumber', 'VendorName']] \
+    .drop_duplicates() \
+    .sort_values('VendorNumber') \
+    .reset_index(drop=True)
+
+#vendor_purchases_unicos.head(8)
+
+vendor_purchases_unicos['VendorName'] = vendor_purchases_unicos['VendorName'].str.strip()
+
+print(len(vendor_purchases_unicos.VendorNumber.unique()))
+print(len(vendor_purchases_unicos.VendorName.unique()))
+```
+
+```{python}
+vendor_purchases_unicos.query('VendorNumber == 2000').VendorName.value_counts()
+```
+
+```{python}
+vendor_purchases_unicos.query('VendorNumber == 1587').VendorName.value_counts()
+```
+
 # Otro
+
 ```{python}
-sales.sample(3)
+vendor_purchases_unicos = vendor_purchases_unicos.drop(vendor_purchases_unicos[vendor_purchases_unicos['VendorName'] == 'VINEYARD BRANDS INC'].index)
+vendor_purchases_unicos = vendor_purchases_unicos.drop(vendor_purchases_unicos[vendor_purchases_unicos['VendorName'] == 'SOUTHERN WINE & SPIRITS NE'].index)
+
+valores_unicos = valores_unicos.drop(valores_unicos[valores_unicos['VendorName'] == 'VINEYARD BRANDS INC'].index)
+valores_unicos = valores_unicos.drop(valores_unicos[valores_unicos['VendorName'] == 'SOUTHERN WINE & SPIRITS NE'].index)
 ```
 
 ```{python}
-sales.query('VendorNo == 8112')
-```
+vendor_sales_unicos.rename(columns={'VendorNo': 'VendorNumber'}, inplace=True)
 
-```{python}
-len(sales.VendorNo.unique())
-```
+resultado = pd.concat([valores_unicos, vendor_purchases_unicos, vendor_sales_unicos], ignore_index=True)
 
-```{python}
-unique_end_inv = sales['VendorNo'].unique()
-unique_beg_inv = invoice_purchases['VendorNumber'].unique()
-
-# Usar 'isin' sobre las series de valores únicos.unique_end_inv
-coincidencias_booleanas = pd.Series(unique_beg_inv).isin(unique_end_inv)
-
-# Contar cuántas coincidencias hay
-cantidad_coincidencias = coincidencias_booleanas.sum()
-cantidad_coincidencias
+# Eliminar duplicados solo por 'VendorNumber'
+resultado = resultado.drop_duplicates(subset=['VendorNumber'], keep='first')
+print(len(resultado.VendorNumber.unique()))
+print(len(resultado.VendorName.unique()))
 ```
