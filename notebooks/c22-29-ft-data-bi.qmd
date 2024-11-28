@@ -26,7 +26,9 @@ import pyprojroot
 ```
 
 ```{python}
-data_path = pyprojroot.here('inventory-analysis-case-study')
+root_path = pyprojroot.here()
+
+data_path = root_path / 'inventory-analysis-case-study'
 
 beg_inv = pd.read_csv(data_path.joinpath('BegInvFINAL12312016.csv'))
 end_inv = pd.read_csv(data_path.joinpath('EndInvFINAL12312016.csv'))
@@ -36,6 +38,44 @@ invoice_purchases = pd.read_csv(
     data_path.joinpath('InvoicePurchases12312016.csv'))
 purchase_prices = pd.read_csv(data_path.joinpath('2017PurchasePricesDec.csv'))
 ```
+
+## Comparar columnas iguales
+
+```{python}
+columns_to_check = ['InventoryId', 'Store', 'Brand', 'Description', 'Size']
+sub_df1 = beg_inv[columns_to_check]
+sub_df2 = end_inv[columns_to_check]
+sub_df3 = sales[columns_to_check]
+sub_df4 = purchases[columns_to_check]
+
+# Comparar si son iguales
+"""are_equal = (
+    sub_df1.equals(sub_df2) and
+    sub_df2.equals(sub_df3) and
+    sub_df3.equals(sub_df4)
+)
+
+print("¿Las tablas son iguales en las columnas seleccionadas?", are_equal)"""
+```
+
+
+```{python}
+sub_df1.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+```
+
+```{python}
+sub_df2.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+```
+
+```{python}
+sub_df3.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+```
+
+```{python}
+sub_df4.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+```
+
+## purchase_prices
 
 ```{python}
 purchase_prices.info()
