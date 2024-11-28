@@ -14,9 +14,10 @@ os.cpu_count()
 ```
 
 ```{python}
-%pip install -r requirements.txt
+%pip install -r ../requirements.txt
 # por si no anda este descomentar el de abajo
 #!pip install -r requirements.txt
+# o pip install -r ../requirements.txt
 ```
 
 ```{python}
