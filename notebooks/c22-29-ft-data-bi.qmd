@@ -14,17 +14,17 @@ os.cpu_count()
 ```
 
 ```{python}
+%pip install -r requirements.txt
+# por si no anda este descomentar el de abajo
+#!pip install -r requirements.txt
+```
+
+```{python}
 from sqlalchemy import create_engine as ce
 from decouple import config
 
 
 engine = ce(config('engine_mysql'))
-```
-
-```{python}
-%pip install -r requirements.txt
-# por si no anda este descomentar el de abajo
-#!pip install -r requirements.txt
 ```
 
 ```{python}
