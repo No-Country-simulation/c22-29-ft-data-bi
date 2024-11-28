@@ -14,6 +14,14 @@ os.cpu_count()
 ```
 
 ```{python}
+from sqlalchemy import create_engine as ce
+from decouple import config
+
+
+engine = ce(config('engine_mysql'))
+```
+
+```{python}
 %pip install -r requirements.txt
 # por si no anda este descomentar el de abajo
 #!pip install -r requirements.txt
@@ -39,7 +47,7 @@ invoice_purchases = pd.read_csv(
 purchase_prices = pd.read_csv(data_path.joinpath('2017PurchasePricesDec.csv'))
 ```
 
-## Comparar columnas iguales
+## Armar Dimensión Inventario
 
 ```{python}
 columns_to_check = ['InventoryId', 'Store', 'Brand', 'Description', 'Size']
@@ -48,31 +56,72 @@ sub_df2 = end_inv[columns_to_check]
 sub_df3 = sales[columns_to_check]
 sub_df4 = purchases[columns_to_check]
 
-# Comparar si son iguales
-"""are_equal = (
-    sub_df1.equals(sub_df2) and
-    sub_df2.equals(sub_df3) and
-    sub_df3.equals(sub_df4)
-)
+inventario_df = pd.concat([sub_df1, sub_df2, sub_df3, sub_df4], ignore_index=True)
 
-print("¿Las tablas son iguales en las columnas seleccionadas?", are_equal)"""
-```
-
-
-```{python}
-sub_df1.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+# Eliminar duplicados solo por 'VendorNumber'
+inventario_df = inventario_df.drop_duplicates(subset=['InventoryId'], keep='first')
 ```
 
 ```{python}
-sub_df2.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+inventario_df.info()
 ```
 
 ```{python}
-sub_df3.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+inventario_df.isnull().sum()
 ```
 
 ```{python}
-sub_df4.query('InventoryId == "32_MOUNTMEND_42881"').value_counts()
+sub_df1.sample(1)
+```
+
+```{python}
+sub_df1.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+sub_df2.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+sub_df3.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+sub_df4.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+inventario_df.to_sql('inventory', con=engine, if_exists="append", index=False)
+```
+
+## Inventario inicio y final
+
+```{python}
+columns_to_inventary = ['InventoryId', 'Store', 'City', 'Brand', 'Description', 'Size']
+inven_df1 = beg_inv[columns_to_inventary]
+inven_df2 = end_inv[columns_to_inventary]
+
+city_inventario_df = pd.concat([inven_df1, inven_df2], ignore_index=True)
+
+city_inventario_df.dropna(inplace=True)
+
+city_inventario_df = city_inventario_df.drop_duplicates(subset=['InventoryId'], keep='first')
+```
+
+```{python}
+city_inventario_df.info()
+```
+
+```{python}
+inven_df1.sample(1)
+```
+
+```{python}
+inven_df1.query('InventoryId == "45_VERITAS_3804"').value_counts()
+```
+
+```{python}
+inven_df2.query('InventoryId == "45_VERITAS_3804"').value_counts()
 ```
 
 ## purchase_prices
@@ -320,7 +369,7 @@ vendor_purchases_unicos.query('VendorNumber == 2000').VendorName.value_counts()
 vendor_purchases_unicos.query('VendorNumber == 1587').VendorName.value_counts()
 ```
 
-# Otro
+# Armar Dimensión Vendedor
 
 ```{python}
 vendor_purchases_unicos = vendor_purchases_unicos.drop(vendor_purchases_unicos[vendor_purchases_unicos['VendorName'] == 'VINEYARD BRANDS INC'].index)
@@ -339,4 +388,8 @@ resultado = pd.concat([valores_unicos, vendor_purchases_unicos, vendor_sales_uni
 resultado = resultado.drop_duplicates(subset=['VendorNumber'], keep='first')
 print(len(resultado.VendorNumber.unique()))
 print(len(resultado.VendorName.unique()))
+```
+
+```{python}
+resultado.to_sql('vendors', con=engine, if_exists="append", index=False)
 ```
