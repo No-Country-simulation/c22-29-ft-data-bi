@@ -1,3 +1,7 @@
+#Types
+*.json
+*.csv
+
 # Quarto and Project Config
 _quarto.yml
 ./.quarto
