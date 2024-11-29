@@ -79,7 +79,7 @@ def download_file(file_id, file_name, save_path):
 if os.path.exists(DATA_PATH):
     shutil.rmtree(DATA_PATH)
 
-os.makedirs(DATA_PATH, exist_ok=True)
+os.makedirs(DATA_PATH)
 logger.info("Crear directorio data")
 
 files = list_files_in_folder(FOLDER_ID)
