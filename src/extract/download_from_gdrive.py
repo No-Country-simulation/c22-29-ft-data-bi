@@ -7,6 +7,7 @@ from google.oauth2.service_account import Credentials
 import time
 import io
 import os
+import sys
 import shutil
 
 
@@ -22,27 +23,18 @@ DATA_PATH = ROOT_PATH / 'data'
 
 FOLDER_ID = config('id_carpeta')
 
-
 # Para hacer logging
 log_file_path = ROOT_PATH / 'logger.log'
 
-logger = logging.getLogger('c22-29-ft-data-bi')
-logger.setLevel(logging.DEBUG)
-
-file_handler = logging.FileHandler(log_file_path, mode='a')
-file_handler.setLevel(logging.DEBUG)
-
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(
+    format='%(asctime)-5s %(levelname)-8s %(message)s',
+    level=logging.DEBUG,
+    handlers=[
+        logging.FileHandler(log_file_path, mode='a', encoding='utf-8'),
+        logging.StreamHandler(sys.stdout)
+    ],
+    datefmt='%A %d-%m-%Y %H:%M:%S'
 )
-file_handler.setFormatter(formatter)
-
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-console_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
 
 
 start_time = time.perf_counter()
@@ -71,9 +63,9 @@ def download_file(file_id, file_name, save_path):
         done = False
         while not done:
             status, done = downloader.next_chunk()
-            logger.info(
+            logging.info(
                 f"Downloading {file_name}: {int(status.progress() * 100)}%")
-    logger.info(f"{file_name} descargado en {file_path}")
+    logging.info(f"{file_name} descargado en {file_path}")
 
 
 if os.path.exists(DATA_PATH):
@@ -83,18 +75,18 @@ os.makedirs(DATA_PATH)
 gitkeep_path = DATA_PATH.joinpath('.gitkeep')
 with open(gitkeep_path, "w") as archivo:
     pass
-logger.info("Crear directorio data")
+logging.info("Crear directorio data")
 
 files = list_files_in_folder(FOLDER_ID)
 if not files:
-    logger.warning("No se encontraron archivos en la carpeta.")
+    logging.warning("No se encontraron archivos en la carpeta.")
 else:
     for file in files:
-        logger.info(f"Descargando {file['name']}...")
+        logging.info(f"Descargando {file['name']}...")
         download_file(file['id'], file['name'], DATA_PATH)
 
 end_time = time.perf_counter()
 execution_time = end_time - start_time
 minutes, seconds = divmod(execution_time, 60)
 
-logger.debug(f"Tardó {int(minutes)} minutos {int(seconds)} segundos en ejecutarse.")
+logging.debug(f"Tardó {int(minutes)} minutos {int(seconds)} segundos en ejecutarse.")
