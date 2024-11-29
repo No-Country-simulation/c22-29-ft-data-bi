@@ -1,6 +1,7 @@
 #Types
 *.json
 *.csv
+**/.gitkeep
 
 # Quarto and Project Config
 _quarto.yml
