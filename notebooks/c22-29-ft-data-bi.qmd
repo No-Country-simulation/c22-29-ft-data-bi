@@ -21,6 +21,14 @@ os.cpu_count()
 ```
 
 ```{python}
+"""
+Descargar los archivos desde Google Drive
+"""
+!python ../src/extract/download_from_gdrive.py
+# o !python3 ../src/extract/download_from_gdrive.py
+```
+
+```{python}
 from sqlalchemy import create_engine as ce
 from decouple import config
 
@@ -32,12 +40,11 @@ engine = ce(config('engine_mysql'))
 import numpy as np
 import pandas as pd
 import pyprojroot
-```
 
-```{python}
+
 root_path = pyprojroot.here()
 
-data_path = root_path / 'inventory-analysis-case-study'
+data_path = root_path / 'data'
 
 beg_inv = pd.read_csv(data_path.joinpath('BegInvFINAL12312016.csv'))
 end_inv = pd.read_csv(data_path.joinpath('EndInvFINAL12312016.csv'))
@@ -57,10 +64,13 @@ sub_df2 = end_inv[columns_to_check]
 sub_df3 = sales[columns_to_check]
 sub_df4 = purchases[columns_to_check]
 
-inventario_df = pd.concat([sub_df1, sub_df2, sub_df3, sub_df4], ignore_index=True)
+inventario_df = pd.concat(
+    [sub_df1, sub_df2, sub_df3, sub_df4], ignore_index=True
+)
 
-# Eliminar duplicados solo por 'VendorNumber'
-inventario_df = inventario_df.drop_duplicates(subset=['InventoryId'], keep='first')
+inventario_df = inventario_df.drop_duplicates(
+    subset=['InventoryId'], keep='first'
+)
 ```
 
 ```{python}
@@ -98,7 +108,9 @@ inventario_df.to_sql('inventory', con=engine, if_exists="append", index=False)
 ## Inventario inicio y final
 
 ```{python}
-columns_to_inventary = ['InventoryId', 'Store', 'City', 'Brand', 'Description', 'Size']
+columns_to_inventary = [
+    'InventoryId', 'Store', 'City', 'Brand', 'Description', 'Size'
+]
 inven_df1 = beg_inv[columns_to_inventary]
 inven_df2 = end_inv[columns_to_inventary]
 
@@ -106,7 +118,9 @@ city_inventario_df = pd.concat([inven_df1, inven_df2], ignore_index=True)
 
 city_inventario_df.dropna(inplace=True)
 
-city_inventario_df = city_inventario_df.drop_duplicates(subset=['InventoryId'], keep='first')
+city_inventario_df = city_inventario_df.drop_duplicates(
+    subset=['InventoryId'], keep='first'
+)
 ```
 
 ```{python}
@@ -224,7 +238,9 @@ vendor_sales_unicos = sales[['VendorNo', 'VendorName']] \
     .sort_values('VendorNo') \
     .reset_index(drop=True)
 
-vendor_sales_unicos['VendorName'] = vendor_sales_unicos['VendorName'].str.strip()
+vendor_sales_unicos['VendorName'] = (
+    vendor_sales_unicos['VendorName'].str.strip()
+)
 
 print(len(vendor_sales_unicos.VendorNo.unique()))
 print(len(vendor_sales_unicos.VendorName.unique()))
@@ -301,12 +317,15 @@ invoice_purchases.Approval.value_counts()
 ```
 
 ```{python}
-buscando = invoice_purchases[invoice_purchases.apply(lambda row: row.astype(str).str.contains("Frank Delahunt").any(), axis=1)]
+buscando = invoice_purchases[invoice_purchases.apply(
+    lambda row: row.astype(str).str.contains("Frank Delahunt").any(), axis=1)]
 invoice_purchases.sample(3)
 ```
 
 ```{python}
-invoice_purchases['Approval'] = invoice_purchases['Approval'].notna().astype(int)
+invoice_purchases['Approval'] = (
+    invoice_purchases['Approval'].notna().astype(int)
+)
 ```
 
 ```{python}
@@ -356,8 +375,9 @@ vendor_purchases_unicos = purchases[['VendorNumber', 'VendorName']] \
 
 #vendor_purchases_unicos.head(8)
 
-vendor_purchases_unicos['VendorName'] = vendor_purchases_unicos['VendorName'].str.strip()
-
+vendor_purchases_unicos['VendorName'] = (
+    vendor_purchases_unicos['VendorName'].str.strip()
+)
 print(len(vendor_purchases_unicos.VendorNumber.unique()))
 print(len(vendor_purchases_unicos.VendorName.unique()))
 ```
