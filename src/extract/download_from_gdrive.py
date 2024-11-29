@@ -80,6 +80,9 @@ if os.path.exists(DATA_PATH):
     shutil.rmtree(DATA_PATH)
 
 os.makedirs(DATA_PATH)
+gitkeep_path = DATA_PATH.joinpath('.gitkeep')
+with open(gitkeep_path, "w") as archivo:
+    pass
 logger.info("Crear directorio data")
 
 files = list_files_in_folder(FOLDER_ID)
