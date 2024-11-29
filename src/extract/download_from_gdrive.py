@@ -36,6 +36,7 @@ logging.basicConfig(
     datefmt='%A %d-%m-%Y %H:%M:%S'
 )
 
+logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
 
 start_time = time.perf_counter()
 
@@ -44,6 +45,7 @@ SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 credentials = Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES
 )
+
 drive_service = build('drive', 'v3', credentials=credentials)
 
 
