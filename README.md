@@ -8,6 +8,7 @@
 - [X] Luz Angela Carabali
 - [X] Jeniffer Caballero
 
-#Introduccion
+# Introduccion
 
 BottleFlow Logistics es una distribuidora de bebidas alcoholicas.
+Distribuimos distintas presentaciones a lo largo del ano.
