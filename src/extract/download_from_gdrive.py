@@ -21,6 +21,8 @@ SERVICE_ACCOUNT_FILE = SERVICE_ACCOUNT_PATH.joinpath(
 
 DATA_PATH = ROOT_PATH / 'data'
 
+RAW_PATH = DATA_PATH / 'raw'
+
 FOLDER_ID = config('id_carpeta')
 
 # Para hacer logging
@@ -74,6 +76,7 @@ if os.path.exists(DATA_PATH):
     shutil.rmtree(DATA_PATH)
 
 os.makedirs(DATA_PATH)
+os.makedirs(RAW_PATH)
 gitkeep_path = DATA_PATH.joinpath('.gitkeep')
 with open(gitkeep_path, "w") as archivo:
     pass
@@ -85,7 +88,7 @@ if not files:
 else:
     for file in files:
         logging.info(f"Descargando {file['name']}...")
-        download_file(file['id'], file['name'], DATA_PATH)
+        download_file(file['id'], file['name'], RAW_PATH)
 
 end_time = time.perf_counter()
 execution_time = end_time - start_time
