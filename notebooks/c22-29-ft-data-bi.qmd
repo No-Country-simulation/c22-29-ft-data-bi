@@ -1,0 +1,416 @@
+---
+title: "c22-29-ft-data-bi"
+lang: "es"
+execute:
+  echo: false
+  output: false
+---
+
+# EDA
+
+```{python}
+import os
+os.cpu_count()
+```
+
+```{python}
+%pip install -r ../requirements.txt
+# por si no anda este descomentar el de abajo
+#!pip install -r requirements.txt
+# o pip install -r ../requirements.txt
+```
+
+```{python}
+"""
+Descargar los archivos desde Google Drive
+"""
+!python ../src/extract/download_from_gdrive.py
+# o !python3 ../src/extract/download_from_gdrive.py
+```
+
+```{python}
+from sqlalchemy import create_engine as ce
+from decouple import config
+
+
+engine = ce(config('engine_mysql'))
+```
+
+```{python}
+import numpy as np
+import pandas as pd
+import pyprojroot
+
+
+root_path = pyprojroot.here()
+
+data_path = root_path / 'data'
+
+beg_inv = pd.read_csv(data_path.joinpath('BegInvFINAL12312016.csv'))
+end_inv = pd.read_csv(data_path.joinpath('EndInvFINAL12312016.csv'))
+sales = pd.read_csv(data_path.joinpath('SalesFINAL12312016.csv'))
+purchases = pd.read_csv(data_path.joinpath('PurchasesFINAL12312016.csv'))
+invoice_purchases = pd.read_csv(
+    data_path.joinpath('InvoicePurchases12312016.csv'))
+purchase_prices = pd.read_csv(data_path.joinpath('2017PurchasePricesDec.csv'))
+```
+
+## Armar Dimensión Inventario
+
+```{python}
+columns_to_check = ['InventoryId', 'Store', 'Brand', 'Description', 'Size']
+sub_df1 = beg_inv[columns_to_check]
+sub_df2 = end_inv[columns_to_check]
+sub_df3 = sales[columns_to_check]
+sub_df4 = purchases[columns_to_check]
+
+inventario_df = pd.concat(
+    [sub_df1, sub_df2, sub_df3, sub_df4], ignore_index=True
+)
+
+inventario_df = inventario_df.drop_duplicates(
+    subset=['InventoryId'], keep='first'
+)
+```
+
+```{python}
+inventario_df.info()
+```
+
+```{python}
+inventario_df.isnull().sum()
+```
+
+```{python}
+sub_df1.sample(1)
+```
+
+```{python}
+sub_df1.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+sub_df2.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+sub_df3.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+sub_df4.query('InventoryId == "58_HARTLEPOOL_21032"').value_counts()
+```
+
+```{python}
+inventario_df.to_sql('inventory', con=engine, if_exists="append", index=False)
+```
+
+## Inventario inicio y final
+
+```{python}
+columns_to_inventary = [
+    'InventoryId', 'Store', 'City', 'Brand', 'Description', 'Size'
+]
+inven_df1 = beg_inv[columns_to_inventary]
+inven_df2 = end_inv[columns_to_inventary]
+
+city_inventario_df = pd.concat([inven_df1, inven_df2], ignore_index=True)
+
+city_inventario_df.dropna(inplace=True)
+
+city_inventario_df = city_inventario_df.drop_duplicates(
+    subset=['InventoryId'], keep='first'
+)
+```
+
+```{python}
+city_inventario_df.info()
+```
+
+```{python}
+inven_df1.sample(1)
+```
+
+```{python}
+inven_df1.query('InventoryId == "45_VERITAS_3804"').value_counts()
+```
+
+```{python}
+inven_df2.query('InventoryId == "45_VERITAS_3804"').value_counts()
+```
+
+## purchase_prices
+
+```{python}
+purchase_prices.info()
+```
+
+```{python}
+len(purchase_prices.VendorName.unique())
+```
+
+```{python}
+purchase_prices.sample(3)
+```
+
+## Inventario Inicial
+
+```{python}
+beg_inv.info()
+```
+
+```{python}
+len(beg_inv.InventoryId.unique())
+```
+
+```{python}
+beg_inv.sample(3)
+```
+
+```{python}
+print(len(beg_inv.InventoryId.unique()))
+print(len(beg_inv.Store.unique()))
+print(len(beg_inv.Brand.unique()))
+```
+
+## Inventario Final
+
+```{python}
+end_inv.info()
+```
+
+```{python}
+len(end_inv.InventoryId.unique())
+```
+
+```{python}
+coincidencias_booleanas = (
+    end_inv['InventoryId']
+    .isin(beg_inv['InventoryId'])
+)
+cantidad_coincidencias = coincidencias_booleanas.sum()
+cantidad_coincidencias
+```
+
+```{python}
+print(len(end_inv.InventoryId.unique()))
+print(len(end_inv.Store.unique()))
+print(len(end_inv.Brand.unique()))
+```
+
+```{python}
+unique_end_inv = end_inv['Store'].unique()
+unique_beg_inv = beg_inv['Store'].unique()
+
+# Usar 'isin' sobre las series de valores únicos
+coincidencias_booleanas = pd.Series(unique_end_inv).isin(unique_beg_inv)
+
+# Contar cuántas coincidencias hay
+coincidencias_booleanas = coincidencias_booleanas.sum()
+coincidencias_booleanas
+```
+
+```{python}
+unique_end_inv = end_inv['Brand'].unique()
+unique_beg_inv = beg_inv['Brand'].unique()
+
+# Usar 'isin' sobre las series de valores únicos
+coincidencias_booleanas = pd.Series(unique_end_inv).isin(unique_beg_inv)
+
+# Contar cuántas coincidencias hay
+cantidad_coincidencias = coincidencias_booleanas.sum()
+cantidad_coincidencias
+```
+
+## Sales
+
+```{python}
+sales.info()
+```
+
+```{python}
+len(sales.InventoryId.unique())
+```
+
+```{python}
+vendor_sales_unicos = sales[['VendorNo', 'VendorName']] \
+    .drop_duplicates() \
+    .sort_values('VendorNo') \
+    .reset_index(drop=True)
+
+vendor_sales_unicos['VendorName'] = (
+    vendor_sales_unicos['VendorName'].str.strip()
+)
+
+print(len(vendor_sales_unicos.VendorNo.unique()))
+print(len(vendor_sales_unicos.VendorName.unique()))
+```
+
+```{python}
+vendor_sales_unicos.query('VendorNo == 2000').VendorName.value_counts()
+```
+
+```{python}
+vendor_sales_unicos.query('VendorNo == 1587').VendorName.value_counts()
+```
+
+```{python}
+vendor_sales_unicos.query('VendorNo == 4425').VendorName.value_counts()
+```
+
+## Invoice purchases 
+
+```{python}
+invoice_purchases.info()
+```
+
+```{python}
+len(invoice_purchases.VendorNumber.unique())
+# 126
+```
+
+```{python}
+len(invoice_purchases.VendorName.unique())
+#129
+```
+
+```{python}
+invoice_purchases.sample(3)
+```
+
+```{python}
+invoice_purchases.VendorName.value_counts()
+```
+
+```{python}
+# 2000
+# 1587
+invoice_purchases.query('VendorNumber == 1587')
+```
+```{python}
+invoice_purchases.query('VendorNumber == 2000').VendorName.value_counts()
+```
+```{python}
+invoice_purchases.query('VendorName == "VINEYARD BRANDS LLC"')
+```
+```{python}
+invoice_purchases.query('VendorNumber == 1587').VendorName.value_counts()
+```
+```{python}
+invoice_purchases.VendorNumber.value_counts()
+```
+```{python}
+invoice_purchases['VendorName'] = invoice_purchases['VendorName'].str.strip()
+```
+
+```{python}
+invoice_purchases.query('VendorNumber == 8112')
+```
+
+```{python}
+invoice_purchases.Approval.sample(3)
+```
+
+```{python}
+len(invoice_purchases.Approval.unique())
+invoice_purchases.Approval.value_counts()
+```
+
+```{python}
+buscando = invoice_purchases[invoice_purchases.apply(
+    lambda row: row.astype(str).str.contains("Frank Delahunt").any(), axis=1)]
+invoice_purchases.sample(3)
+```
+
+```{python}
+invoice_purchases['Approval'] = (
+    invoice_purchases['Approval'].notna().astype(int)
+)
+```
+
+```{python}
+valores_unicos = invoice_purchases[['VendorNumber', 'VendorName']] \
+    .drop_duplicates() \
+    .sort_values('VendorNumber') \
+    .reset_index(drop=True)
+
+valores_unicos['VendorName'] = valores_unicos['VendorName'].str.strip()
+```
+
+```{python}
+print(len(valores_unicos.VendorNumber.unique()))
+print(len(valores_unicos.VendorName.unique()))
+```
+
+```{python}
+valores_unicos.query('VendorNumber == 1587')
+#valores_unicos.head(8)
+```
+
+## Purchases
+
+```{python}
+purchases.info()
+```
+
+```{python}
+print(len(purchases.InventoryId.unique()))
+print(len(purchases.Store.unique()))
+print(len(purchases.Brand.unique()))
+```
+
+```{python}
+purchases.sample(3)
+```
+
+```{python}
+purchases.query('VendorNumber == 8112')
+```
+
+```{python}
+vendor_purchases_unicos = purchases[['VendorNumber', 'VendorName']] \
+    .drop_duplicates() \
+    .sort_values('VendorNumber') \
+    .reset_index(drop=True)
+
+#vendor_purchases_unicos.head(8)
+
+vendor_purchases_unicos['VendorName'] = (
+    vendor_purchases_unicos['VendorName'].str.strip()
+)
+print(len(vendor_purchases_unicos.VendorNumber.unique()))
+print(len(vendor_purchases_unicos.VendorName.unique()))
+```
+
+```{python}
+vendor_purchases_unicos.query('VendorNumber == 2000').VendorName.value_counts()
+```
+
+```{python}
+vendor_purchases_unicos.query('VendorNumber == 1587').VendorName.value_counts()
+```
+
+# Armar Dimensión Vendedor
+
+```{python}
+vendor_purchases_unicos = vendor_purchases_unicos.drop(vendor_purchases_unicos[vendor_purchases_unicos['VendorName'] == 'VINEYARD BRANDS INC'].index)
+vendor_purchases_unicos = vendor_purchases_unicos.drop(vendor_purchases_unicos[vendor_purchases_unicos['VendorName'] == 'SOUTHERN WINE & SPIRITS NE'].index)
+
+valores_unicos = valores_unicos.drop(valores_unicos[valores_unicos['VendorName'] == 'VINEYARD BRANDS INC'].index)
+valores_unicos = valores_unicos.drop(valores_unicos[valores_unicos['VendorName'] == 'SOUTHERN WINE & SPIRITS NE'].index)
+```
+
+```{python}
+vendor_sales_unicos.rename(columns={'VendorNo': 'VendorNumber'}, inplace=True)
+
+resultado = pd.concat([valores_unicos, vendor_purchases_unicos, vendor_sales_unicos], ignore_index=True)
+
+# Eliminar duplicados solo por 'VendorNumber'
+resultado = resultado.drop_duplicates(subset=['VendorNumber'], keep='first')
+print(len(resultado.VendorNumber.unique()))
+print(len(resultado.VendorName.unique()))
+```
+
+```{python}
+resultado.to_sql('vendors', con=engine, if_exists="append", index=False)
+```

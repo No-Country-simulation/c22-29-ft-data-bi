@@ -1,0 +1,15 @@
+numpy
+pandas
+matplotlib
+seaborn
+jupyter
+ipykernel
+python-decouple
+SQLAlchemy
+PyMySQL
+mysql-connector-python
+pyprojroot
+google-api-python-client
+google-auth
+google-auth-oauthlib
+pyarrow

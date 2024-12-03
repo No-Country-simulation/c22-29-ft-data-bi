@@ -1,0 +1,8 @@
+# crear archivo llamado _quarto.yml
+# copiar este archivo
+# por si no funciona el copiar este, las sangrías son dos espacios
+project:
+  title: "c22-29-ft-data-bi"
+  render:
+    - "*.qmd"
+    - "!{acá estaría la dirección de su entorno pegar aquí despues del ! sin llaves, el entorno es personal}"

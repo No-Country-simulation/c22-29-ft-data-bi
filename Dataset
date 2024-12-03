@@ -1,0 +1,10 @@
+link del dataset :
+https://www.kaggle.com/datasets/bhanupratapbiswas/inventory-analysis-case-study?resource=download
+
+repositorio de kaggle:
+import kagglehub
+
+# Download latest version
+path = kagglehub.dataset_download("bhanupratapbiswas/inventory-analysis-case-study")
+
+print("Path to dataset files:", path)
