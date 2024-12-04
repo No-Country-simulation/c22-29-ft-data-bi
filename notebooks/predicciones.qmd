@@ -1,0 +1,166 @@
+---
+jupyter: python3
+lang: "es"
+execute:
+  echo: false
+  output: false
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import openpyxl
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+```
+
+```{python}
+# Cargar los datos 
+beg_inv = pd.read_csv('BegInv12312016.csv')
+end_inv = pd.read_csv('EndInvFINAL12312016.csv')
+purchases = pd.read_csv('purchasesFINAL12312016.csv')
+```
+
+```{python}
+# Verificar las columnas cargadas
+print(beg_inv.columns, end_inv.columns, purchases.columns)
+```
+
+```{python}
+# Combinar inventario inicial y final
+inventory_data = beg_inv.merge(
+    end_inv, 
+    on=['InventoryId', 'Store', 'City', 'Brand', 'Description', 'Size'], 
+    suffixes=('_start', '_end')
+)
+```
+
+```{python}
+# Calcular el flujo neto del inventario
+inventory_data['net_change'] = inventory_data['onHand_end'] - inventory_data['onHand_start']
+```
+
+```{python}
+# Agregar información de compras
+inventory_data = inventory_data.merge(
+    purchases, 
+    on=['InventoryId', 'Store', 'Brand', 'Description', 'Size'], 
+    how='left'
+)
+```
+
+```{python}
+# Rellenar valores nulos en Quantity
+inventory_data['Quantity'] = inventory_data['Quantity'].fillna(0)
+```
+
+```{python}
+# Convertir columnas de fechas a formato datetime
+inventory_data['startDate'] = pd.to_datetime(inventory_data['startDate'])
+inventory_data['endDate'] = pd.to_datetime(inventory_data['endDate'])
+inventory_data['PODate'] = pd.to_datetime(inventory_data['PODate'])
+```
+
+```{python}
+# Calcular variables de tiempo
+inventory_data['inventory_duration_days'] = (inventory_data['endDate'] - inventory_data['startDate']).dt.days
+```
+
+```{python}
+# Crear variable de compras totales por producto
+inventory_data['purchased_quantity'] = inventory_data['Quantity']
+```
+
+```{python}
+# Crear el objetivo (target) basado en inventario final y compras
+inventory_data['target_stock_2017'] = (
+    inventory_data['onHand_end'] + inventory_data['purchased_quantity'] - inventory_data['net_change']
+)
+```
+
+```{python}
+# Seleccionar columnas relevantes
+features = ['onHand_start', 'purchased_quantity', 'Price_start', 'inventory_duration_days','Brand']
+target = 'target_stock_2017'
+```
+
+```{python}
+# Eliminar datos faltantes en las columnas seleccionadas
+inventory_data = inventory_data.dropna(subset=features + [target])
+```
+
+```{python}
+X = inventory_data[features]
+y = inventory_data[target]
+
+# Dividir en conjunto de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+```{python}
+# Crear el modelo
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Entrenar el modelo
+model.fit(X_train, y_train)
+```
+
+```{python}
+# Predicciones en el conjunto de prueba
+y_pred = model.predict(X_test)
+
+# Métricas de evaluación
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error (MSE): {mse}")
+print(f"R^2 Score: {r2}")
+```
+
+```{python}
+X_2017 = X_test.copy()
+
+# Simular cambios en las compras (si es necesario)
+X_2017['purchased_quantity'] *= 1.1
+X_2017['inventory_duration_days'] *= 1.05
+
+# Predecir el stock de 2017
+predicted_stock_2017 = model.predict(X_2017)
+X_2017['predicted_stock_2017'] = predicted_stock_2017
+```
+
+```{python}
+print(X_2017.head())
+```
+
+```{python}
+plt.figure(figsize=(10, 6))
+sns.histplot(X_2017['predicted_stock_2017'], kde=True, bins=30, color='blue')
+plt.title('Distribución del Inventario Predicho para 2017')
+plt.xlabel('Inventario Predicho')
+plt.ylabel('Frecuencia')
+plt.show()
+```
+
+```{python}
+# Especificar las columnas que quieres incluir
+output_data = X_2017[
+    ['onHand_start', 'purchased_quantity', 'Price_start', 
+     'inventory_duration_days','Brand', 'predicted_stock_2017']
+]
+
+# Exportar a un archivo Excel
+output_file = 'predicted_stock_2017.xlsx'
+output_data.to_excel(output_file, index=False)
+
+print(f"Predicciones guardadas en el archivo: {output_file}")
+```
+
+```{python}
+print(X_2017.columns)
+
+```
+
