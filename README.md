@@ -43,7 +43,7 @@ del proyecto)
 CODIGO ( Incluye fragmentos de código relevantes y explique su función)
 
 
-LICENCIAS Y AGRADECIMIENTOS(: Menciona las licencias utilizadas y agradece a las personas que
+~~LICENCIAS~~ Y AGRADECIMIENTOS(: ~~Menciona las licencias utilizadas~~ y agradece a las personas que
 han contribuido al proyecto)
 
 TABLA DE CONTENIDOS(Incluye una tabla de contenidos para facilitar la navegación en el
