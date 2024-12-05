@@ -1,0 +1,514 @@
+---
+title: "presentacion"
+jupyter: python3
+lang: "es"
+execute:
+  echo: false
+  output: false
+---
+
+
+## Problema:
+La empresa "BotterFlow Logistic" se especializa en la comercialización de licores. Actualmente, enfrenta problemas en el manejo de su stock debido a inconsistencias entre las cantidades registradas en su sistema y el inventario real en sus bodegas.
+
+Lo cual ha generado incumplimiento en pedidos; clientes mayoristas han solicitado productos que, según el sistema, están disponibles, pero al momento de preparar los pedidos se descubre que no hay suficiente stock. Otros productos permanecen en inventario más tiempo del esperado, aumentando costos de almacenamiento y el riesgo de expiración.
+
+Realización de pedidos innecesarios a proveedores o insuficientes para cubrir la demanda, afectando la rotación de productos. El equipo de gestión realiza un análisis de inventario para identificar áreas de mejora y optimizar sus prácticas de gestión de inventario.
+
+```{python}
+"""
+Descargar los archivos desde Google Drive
+"""
+#!python ../src/extract/downloadrom_gdrive.py
+# o !python3 ../src/extract/downloadrom_gdrive.py
+```
+
+```{python}
+import numpy as np
+import pandas as pd
+import pyprojroot
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+root_path = pyprojroot.here()
+
+data_path = root_path / 'data' / 'raw'
+
+beg_inv = pd.read_csv(data_path.joinpath('BegInvFINAL12312016.csv'))
+end_inv = pd.read_csv(data_path.joinpath('EndInvFINAL12312016.csv'))
+sales = pd.read_csv(data_path.joinpath('SalesFINAL12312016.csv'))
+purchases = pd.read_csv(data_path.joinpath('PurchasesFINAL12312016.csv'))
+invoice_purchases = pd.read_csv(
+    data_path.joinpath('InvoicePurchases12312016.csv'))
+#purchase_prices = pd.read_csv(data_path.joinpath('2017PurchasePricesDec.csv'))
+```
+
+```{python}
+invoice_purchases.info()
+```
+
+
+```{python}
+# Mostrar nombres de columnas y una vista previa de cada conjunto de datos para identificar inconsistencias
+print("Columnas y primeras filas de cada archivo:")
+
+print("Inventario Inicial:")
+print(beg_inv.columns)
+print(beg_inv.head(10))
+print('beg_inv info: ')
+print(beg_inv.info())
+print('beg_inv null values: ')
+print(beg_inv.isnull().sum())
+print('beg_inv duplicated: ')
+print(beg_inv.duplicated().value_counts())
+
+print("Inventario Final:")
+print(end_inv.columns)
+print(end_inv.head(10))
+print('end_inv info: ')
+print(end_inv.info())
+print('end_inv null values: ')
+print(end_inv.isnull().sum())
+print('end_inv duplicated: ')
+print(end_inv.duplicated().value_counts())
+
+print("Compras:")
+print(purchases.columns)
+print(purchases.head(10))
+print('purchases info: ')
+print(purchases.info())
+print('purchases null values: ')
+print(purchases.isnull().sum())
+print('purchases duplicated: ')
+print(purchases.duplicated().value_counts())
+
+print("Facturas de Compras:")
+print(invoice_purchases.columns)
+print(invoice_purchases.head(10))
+print('invoice_purchases info: ')
+print(invoice_purchases.info())
+print('invoice_purchases null values: ')
+print(invoice_purchases.isnull().sum())
+print('invoice_purchases duplicated: ')
+print(invoice_purchases.duplicated().value_counts())
+
+print("Ventas:")
+print(sales.columns)
+print(sales.head(10))
+print('sales info: ')
+print(sales.info())
+print('sales null values: ')
+print(sales.isnull().sum())
+print('sales duplicated: ')
+print(sales.duplicated().value_counts())
+```
+
+
+```{python}
+# Rellenar datos faltantes en la columna "City" del inventario final
+end_inv["City"] = end_inv["City"].fillna("TYWARDREATH")
+
+# Eliminar filas con valores faltantes en "Size" en la tabla compras
+purchases.dropna(subset=["Size"], inplace=True)
+
+# Eliminar columna "Approval" de la tabla facturas de compra
+invoice_purchases = invoice_purchases.drop(['Approval'], axis=1)
+
+sales = sales.drop(["Volume"], axis = 1)
+```
+
+```{python}
+print('beg_inv columns:')
+print(beg_inv.columns)
+print('beg_inv null values: ')
+print(beg_inv.isnull().sum().value_counts())
+
+print('end_inv columns:')
+print(end_inv.columns)
+print('end_inv null values: ')
+print(end_inv.isnull().sum().value_counts())
+
+print('purchases columns:')
+print(purchases.columns)
+print('purchases null values: ')
+print(purchases.isnull().sum().value_counts())
+
+print('invoice_purchases columns:')
+print(invoice_purchases.columns)
+print('invoice_purchases null values: ')
+print(invoice_purchases.isnull().sum().value_counts())
+
+print('sales columns:')
+print(sales.columns)
+print('sales null values: ')
+print(sales.isnull().sum().value_counts())
+```
+
+```{python}
+# Estandarizar el formato de fecha
+def format_time(df, *columns, dateormat='%Y-%m-%d'):
+    for col in columns:
+        try:
+            df[col] = pd.to_datetime(df[col], errors='coerce')  # Convierte a datetime
+            df[col] = df[col].dt.strftime(dateormat)          # Aplica formato
+        except Exception as e:
+            print(f"Error al procesar la columna {col}: {e}")
+    return df
+
+
+beg_inv = format_time(beg_inv, "startDate")
+end_inv = format_time(end_inv, "endDate")
+purchases = format_time(purchases, "PODate", "ReceivingDate", "InvoiceDate", "PayDate")
+invoice_purchases = format_time(invoice_purchases, "InvoiceDate", "PODate", "PayDate")
+sales = format_time(sales, "SalesDate")
+```
+
+```{python}
+# Eliminar espacios en todas las columnas tipo texto.
+def strip_spaces(df):
+    for col in df.select_dtypes(include=['object', 'string']).columns:
+        df[col] = df[col].str.strip()
+    return df
+
+# Aplicar la función a cada archivo
+beg_inv = strip_spaces(beg_inv)
+end_inv = strip_spaces(end_inv)
+purchases = strip_spaces(purchases)
+invoice_purchases = strip_spaces(invoice_purchases)
+sales = strip_spaces(sales)
+
+# Confirmar que se eliminaron los espacios
+print(beg_inv.head())
+print(end_inv.head())
+print(purchases.head())
+print(invoice_purchases.head())
+print(sales.head())
+```
+
+```{python}
+# Combinar las columnas "Size" de los DataFrames, ignorando las ausentes
+datarames = [beg_inv, end_inv, purchases, sales]
+all_sizes = pd.concat([df["Size"] for df in datarames if "Size" in df.columns], ignore_index=True)
+
+# Contar las ocurrencias únicas directamente con value_counts
+size_counts = all_sizes.value_counts().reset_index()
+size_counts.columns = ["Size", "Total Count"]
+
+pd.set_option('display.max_rows', None)
+
+# Mostrar el resultado
+print(size_counts)
+
+pd.reset_option('display.max_rows')
+```
+
+```{python}
+# Podemos observar que hay 76 diferentes tipos de medidas para expresar el volumen.
+# Se observan diferentes expresiones de medidas de volumen.
+#   - Para referenciar litro encontramos referencias como: Liter, L o l.
+#   - Se observan volúmenes expresados en Oz.
+#   - Hay otros patrones como 750mL, 375mL 2 Pk, 25.0, etc.
+# 
+# Debemos estandarizar la medida de volumen
+```
+
+```{python}
+import re
+
+# Función para estandarizar las medidas de volumen en mililitros (mL)
+def convert_to_milliliters(size):
+    size = str(size).lower()
+    
+    # Manejo del caso "3/100ml" y "5/2 oz"
+    if "3/100ml" in size: 
+        return 3 * 100  # 3/100ml → 3 paquetes de 100ml
+    elif '5/2 oz' in size: 
+        return round(10 * 29.5735, 2)  # 5/2 oz → 10 onzas (1/2 * 5)
+
+    # Convertir galones a mililitros
+    elif 'gal' in size:
+        gal_value = float(re.search(r'\d+\.*\d*', size).group())
+        return round(gal_value * 3785.41, 2)  # 1 gal = 3785.41 mL
+
+    # Manejar patrones como "750ml", "750mL + 3/", "750 4pk", etc.
+    elif 'ml' in size:
+        if 'p' in size:
+            ml_value, pack_value = re.search(r'(\d+\.*\d*)\s*m*l*\s*(\d*)\s*p*/*P*k*/*', size).groups()
+            ml_value = float(ml_value)
+            pack_value = float(pack_value) if pack_value else 1
+            return round(ml_value * pack_value, 2)  # Multiplicar por el número de paquetes
+        elif '+' in size:
+            ml_value, pack_value = map(float, re.findall(r'\d+\.*\d*', size))
+            return round(ml_value + (pack_value * 50), 2)  # Sumar la cantidad adicional
+        else:
+            ml_value = float(re.search(r'\d+\.*\d*', size).group())
+            return round(ml_value, 2)
+
+    # Convertir litros a mililitros
+    elif 'liter' in size or 'l' in size:
+        if size == 'liter' or size == 'l': 
+            return 1000.0
+        else:
+            liter_value = float(re.search(r'\d+\.*\d*', size).group())
+            return round(liter_value * 1000, 2)  # 1 litro = 1000 mL
+
+    # Convertir onzas líquidas (oz) a mililitros
+    elif 'oz' in size:
+        oz_value = float(re.search(r'\d+\.*\d*', size).group())
+        return round(oz_value * 29.5735, 2)  # 1 oz = 29.5735 mL
+
+    # Retornar None si no se puede interpretar
+    else:
+        return None
+
+# Lista de DataFrames
+datasets = [beg_inv, end_inv, purchases, sales]
+
+# Aplicar la función de conversión a cada DataFrame
+for i, dataset in enumerate(datasets):
+    if "Size" in dataset.columns:  # Verificar si la columna "Size" existe
+        dataset['Size'] = dataset['Size'].apply(convert_to_milliliters)
+        datasets[i] = dataset
+
+# Imprimir los resultados convertidos
+for i, dataset in enumerate(datasets):
+    print(f"DataFrame {i + 1}:")
+    print(dataset)
+    print()
+```
+
+## Análisis de inventario
+En esta sección, analizaremos los parámetros fundamentales de la gestión de inventario y extraeremos información relevante sobre stock e inventario disponible.
+
+Se buscará:
+1. Detectar y analizar outliers.
+2. Visualizar la información de manera más clara.
+3. Agregar contexto relevante (proveedor, riesgo).
+
+
+```{python}
+
+purchases['ReceivingDate'] = pd.to_datetime(purchases['ReceivingDate'], format='%Y-%m-%d', errors='coerce')
+purchases['PODate'] = pd.to_datetime(purchases['PODate'], format='%Y-%m-%d', errors='coerce')
+
+# Calcular el plazo de entrega en días
+purchases['Lead_Time'] = (purchases['ReceivingDate'] - purchases['PODate']).dt.days
+
+# Agrupación adicional por proveedor
+LT_summary = purchases.groupby(['Brand', 'Description']).agg(
+    Max_LT_inDays=('Lead_Time', 'max'), 
+    Min_LT_inDays=('Lead_Time', 'min'), 
+    Avg_LT_inDays=('Lead_Time', 'mean')).round(2).reset_index()
+
+# Identificar outliers en Lead_Time usando IQR
+q1 = purchases['Lead_Time'].quantile(0.25)
+q3 = purchases['Lead_Time'].quantile(0.75)
+iqr = q3 - q1
+outlier_threshold_low = q1 - 1.5 * iqr
+outlier_threshold_high = q3 + 1.5 * iqr
+
+# Filtrar outliers
+outliers = purchases[(purchases['Lead_Time'] < outlier_threshold_low) | 
+                       (purchases['Lead_Time'] > outlier_threshold_high)]
+print(f"Número de outliers detectados: {len(outliers)}")
+```
+
+```{python}
+# Boxplot para tiempos de entrega
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=LT_summary, x="Avg_LT_inDays", color="skyblue")
+plt.title("Boxplot del Tiempo Promedio de Entrega")
+plt.xlabel("Tiempo Promedio de Entrega (Días)")
+plt.show()
+```
+
+```{python}
+
+# El gráfico de caja muestra la distribución de los plazos de entrega promedio de los productos. 
+# La mayoría de los productos tienen un plazo de entrega promedio de aproximadamente 7 u 8 días, 
+# como lo muestra la distribución normal. Por lo tanto, la mayoría de los vendedores entregan los 
+# productos en el plazo de una semana.
+```
+
+```{python}
+
+# Clasificar productos según tiempo máximo de entrega
+def categorize_lead_time(max_lt):
+    if max_lt <= 5:
+        return "Riesgo Bajo"
+    elif 5 < max_lt <= 15:
+        return "Riesgo Medio"
+    else:
+        return "Riesgo Alto"
+
+LT_summary['Riesgo'] = LT_summary['Max_LT_inDays'].apply(categorize_lead_time)
+
+# Ver distribución de categorías de riesgo
+risk_distribution = LT_summary['Riesgo'].value_counts()
+print(risk_distribution)
+
+# Gráfico de barras para distribución de riesgo
+risk_distribution.plot(kind='bar', color=['green', 'orange', 'red'], alpha=0.7)
+plt.title("Distribución de Categorías de Riesgo")
+plt.xlabel("Categoría de Riesgo")
+plt.ylabel("Cantidad de Productos")
+plt.show()
+```
+
+```{python}
+# Calcular desviación estándar del tiempo de entrega
+LT_summary['Std_LT_inDays'] = purchases.groupby(['Brand', 'Description'])['Lead_Time'].std().round(2).reset_index(drop=True)
+
+# Calcular proporción de pedidos entregados en menos de X días (por ejemplo, 7 días)
+LT_summary['On_Time_Rate'] = purchases.groupby(['Brand', 'Description']).apply(
+    lambda group: (group['Lead_Time'] <= 7).mean(), include_groups=False
+).round(2).reset_index(drop=True)
+
+# Histograma de desviación estándar del tiempo de entrega
+plt.figure(figsize=(10, 6))
+plt.hist(LT_summary['Std_LT_inDays'], bins=30, color='skyblue', edgecolor='black', alpha=0.7)
+plt.title("Distribución de la Desviación Estándar del Tiempo de Entrega")
+plt.xlabel("Desviación Estándar (Días)")
+plt.ylabel("Frecuencia")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+```{python}
+# Stock de seguridad e inventario disponible
+# Como el stock de seguridad mide la cantidad de inventario de reserva que se debe tener, se debe
+# determinar el stock de seguridad óptimo en función de la cantidad de ventas 
+# y la cantidad de stock de seguridad necesaria para que las ventas se realicen sin problemas.
+```
+
+```{python}
+# Convertir SalesDate a formato datetime
+sales['SalesDate'] = pd.to_datetime(sales['SalesDate'], errors='coerce')
+
+# Realizar el resumen de ventas
+sales_summary = sales.groupby(['Brand', 'Description']).agg(
+                        Max_Sales_Qty=("SalesQuantity", 'max'),
+                        Min_Sales_Qty=("SalesQuantity", 'min'),
+                        Tot_SalesQty=('SalesQuantity', 'sum')).reset_index()
+
+# Calcular las ventas por día de cada producto agrupado por marca
+total_sales_days = (sales['SalesDate'].max() - sales['SalesDate'].min()).days
+sales_summary['Avg_Sales/Day'] = (sales_summary['Tot_SalesQty'] / total_sales_days).round(2)
+
+# Unir el tiempo de entrega y los datos de ventas
+Safty_stock = pd.merge(sales_summary, LT_summary, on = ["Brand", "Description"])
+
+# Calcular el stock de seguridad óptimo y stock máximo necesario
+Safty_stock["Optimal_SS"] = np.ceil(Safty_stock["Avg_LT_inDays"] * Safty_stock["Avg_Sales/Day"]).round(0)
+Safty_stock["Max_SS"] = np.ceil(Safty_stock["Max_LT_inDays"] * Safty_stock["Avg_Sales/Day"]).round(0)
+
+# Identificar outliers en las ventas
+q1 = sales_summary['Avg_Sales/Day'].quantile(0.25)
+q3 = sales_summary['Avg_Sales/Day'].quantile(0.75)
+iqr = q3 - q1
+outlier_threshold_low = q1 - 1.5 * iqr
+outlier_threshold_high = q3 + 1.5 * iqr
+
+# Filtrar productos sin outliers
+filtered_data = sales_summary[
+    (sales_summary['Avg_Sales/Day'] >= outlier_threshold_low) &
+    (sales_summary['Avg_Sales/Day'] <= outlier_threshold_high)
+]
+
+# Verificar los resultados
+print(sales_summary.head())
+```
+
+```{python}
+# Histograma de ventas promedio por día
+plt.figure(figsize=(10, 6))
+plt.hist(sales_summary['Avg_Sales/Day'], bins=30, color='steelblue', edgecolor='black', alpha=0.7)
+plt.title("Distribución de Ventas Promedio por Día")
+plt.xlabel("Ventas Promedio por Día")
+plt.ylabel("Frecuencia")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+
+# Histograma de distribución óptima del stock seguro
+plt.figure(figsize=(10, 6))
+plt.hist(Safty_stock['Optimal_SS'], bins=30, color='tomato', edgecolor='black', alpha=0.7)
+plt.title("Distribución de stock de seguridad")
+plt.xlabel("Stock seguro óptimo")
+plt.ylabel("Frecuencia")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+```{python}
+# |  output: true
+# Los histogramas representan el recuento de stock de seguridad requerido para cada marca 
+# junto con sus ventas diarias promedio.
+# Sin embargo, debido a que los datos están muy sesgados hacia la izquierda, la distribución 
+# de los puntos de datos en el lado derecho no es claramente visible.
+
+# Para poder visualizar esto mejor, utilizaremos un diagrama de caja.
+```
+
+```{python}
+# |  output: true
+fig, ax = plt.subplots(figsize=(15, 3))
+ax.boxplot(Safty_stock['Optimal_SS'], vert=False, boxprops=dict(color='tab:orange'),  
+                            flierprops=dict(markeredgecolor='tab:gray'))
+ax.set_xticks(range(0, int(Safty_stock["Optimal_SS"].max()) + 1, 200)) 
+ax.set_title('Distribución óptima del stock seguro')
+ax.set_xlabel('Stock Seguro Óptimo')
+ax.set_ylabel('Distribución')
+plt.show()
+```
+
+
+Como podemos observar, la mayoría de los productos requieren un stock de seguridad de entre cero y 200. Sin embargo, el diagrama de caja muestra que algunos productos necesitan hasta 3500 unidades en existencias de seguridad.
+
+
+Evaluar el inventario disponible.
+Se tendra en cuenta el inventario final, como inventario disponible.
+
+
+```{python}
+# |  output: true
+# Analisis de inventario final disponible por marca
+# Filtrar inventario más reciente
+latest_onhand_inv = end_inv[end_inv['endDate'] == end_inv['endDate'].max()] \
+                    .groupby(['Brand', 'Description']).agg(Onhand_Stock=('onHand', 'sum')).reset_index()
+
+# Unión con Safty_stock
+onhand_inv_data = Safty_stock.merge(latest_onhand_inv, on=['Brand', 'Description'], how='left').fillna({'Onhand_Stock': 0})
+
+# Calcular estado del inventario
+onhand_inv_data['Inventory_Status'] = onhand_inv_data['Onhand_Stock'] - onhand_inv_data['Optimal_SS']
+onhand_inv_data['Inv_Shortage/Surplus'] = np.where(
+    onhand_inv_data['Inventory_Status'] < 0, 'Inv_Shortage',
+    np.where(onhand_inv_data['Inventory_Status'] == 0, 'Balance', 'Inv_Surplus')
+)
+
+# Resumen de categorías
+print(onhand_inv_data['Inv_Shortage/Surplus'].value_counts())
+
+# Visualización de estados del inventario
+fig, ax = plt.subplots(figsize=(11, 4))
+sns.boxplot(data=onhand_inv_data, x="Inv_Shortage/Surplus", y="Inventory_Status", ax=ax, palette="Set2")
+
+# Agregar conteos en el gráfico
+counts = onhand_inv_data['Inv_Shortage/Surplus'].value_counts()
+for i, count in enumerate(counts):
+    ax.text(i, onhand_inv_data['Inventory_Status'].max(), str(count), ha='center', va='bottom', fontsize=10)
+
+# Etiquetas y título
+plt.xlabel("Estado del Inventario")
+plt.ylabel("Estado (Diferencia)")
+plt.title("Distribución del Estado del Inventario")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+```
+
+
+# |  output: true
+El gráfico muestra que la empresa tiene un inventario excesivo de un 84% de sus productos, lo que le genera costos de mantenimiento de inventario sustanciales. Por otro lado, hay un 15% de déficit en el inventario. Por lo tanto, solo un 1% del inventario presenta un stock equilibrado.
+
+La empresa debe abordar este problema reduciendo el excedente de inventario y cubriendo los faltantes de inventario para mantener el equilibrio.
