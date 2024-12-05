@@ -6,6 +6,7 @@
 # Quarto and Project Config
 _quarto.yml
 ./.quarto
+*/presentacion/
 
 inventory-analysis-case-study/
 
