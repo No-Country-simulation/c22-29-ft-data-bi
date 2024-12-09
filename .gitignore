@@ -2,11 +2,14 @@
 *.json
 *.csv
 **/.gitkeep
+*.html
+*.xlsx
 
 # Quarto and Project Config
 _quarto.yml
 ./.quarto
 */presentacion/
+*_files/
 
 inventory-analysis-case-study/
 
