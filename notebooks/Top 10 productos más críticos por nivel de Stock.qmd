@@ -1,0 +1,141 @@
+---
+jupyter: python3
+lang: "es"
+execute:
+  echo: false
+  output: false
+---
+
+
+```{python}
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+```
+
+```{python}
+import pyprojroot
+
+
+root_path = pyprojroot.here()
+
+data_path = root_path / 'data' / 'raw'
+
+beg_inv = pd.read_csv(data_path.joinpath('BegInvFINAL12312016.csv'))
+end_inv = pd.read_csv(data_path.joinpath('EndInvFINAL12312016.csv'))
+sales = pd.read_csv(data_path.joinpath('SalesFINAL12312016.csv'))
+purchases = pd.read_csv(data_path.joinpath('PurchasesFINAL12312016.csv'))
+invoice_purchases = pd.read_csv(
+    data_path.joinpath('InvoicePurchases12312016.csv'))
+purchase_prices = pd.read_csv(data_path.joinpath('2017PurchasePricesDec.csv'))
+```
+
+
+```{python}
+# Realizar copia del dataset
+beg_inv_f = beg_inv.copy() 
+end_inv_f = end_inv.copy()
+purchases_f = purchases.copy()
+invoice_purchases_f= invoice_purchases.copy()
+purchase_prices_f = purchase_prices.copy()
+sales_f = sales.copy()
+```
+
+```{python}
+# Rellenar datos faltantes en la columna "City" del inventario final
+end_inv_f["City"] = end_inv_f["City"].fillna("TYWARDREATH")
+
+# Eliminar filas con valores faltantes en "Size" en la tabla compras
+purchases_f.dropna(subset=["Size"], inplace=True)
+
+# Eliminar columna "Approval" de la tabla facturas de compra
+invoice_purchases_f = invoice_purchases_f.drop(['Approval'], axis=1)
+
+# Eliminar valores faltantes de las columnas "Description" y "Size" de la tabla precios de compra
+purchase_prices_f.dropna(subset=["Description"], inplace=True)
+purchase_prices_f.dropna(subset=["Size"], inplace=True)
+
+# Eliminar columna "Volume" de la tabla precios de compra
+purchase_prices_f = purchase_prices_f.drop(["Volume"], axis=1)
+sales_f = sales_f.drop(["Volume"], axis = 1)
+```
+
+```{python}
+# Calcular el Onhand_Stock
+onhand_data = pd.merge(end_inv, sales, on='InventoryId', how='left')
+onhand_data['Onhand_Stock'] = onhand_data['onHand'] - onhand_data['SalesQuantity']
+
+# Agregar información de marca y descripción
+onhand_data = pd.merge(onhand_data, beg_inv[['InventoryId', 'Brand', 'Description']], on='InventoryId', how='left')
+
+# Calcular el Optimal_SS
+onhand_data['Optimal_SS'] = ((onhand_data['onHand'] + beg_inv.set_index('InventoryId').get(onhand_data['InventoryId'], default=0)) / 2) * 0.5
+
+# Determinar el estado del inventario
+def inventory_status(row):
+    if row['Onhand_Stock'] >= row['Optimal_SS']:
+        return 'OK'
+    if row['Onhand_Stock'] < row['Optimal_SS'] * 0.5:
+        return 'BAJO'
+    return 'EXCESIVO'
+
+onhand_data['Inventory_Status'] = onhand_data.apply(inventory_status, axis=1)
+
+# Filtrar las columnas necesarias
+onhand_inv_data = onhand_data[['Brand', 'Description', 'Onhand_Stock', 'Optimal_SS', 'Inventory_Status']]
+
+# Mostrar el DataFrame resultante
+print(onhand_inv_data)
+
+# Exportar a CSV si es necesario
+onhand_inv_data.to_csv('OnhandInventoryData.csv', index=False)
+```
+
+```{python}
+# Filtrar los productos críticos con estado "BAJO"
+critical_products = onhand_inv_data[onhand_inv_data['Inventory_Status'] == 'BAJO']
+
+# Ordenar los productos por el nivel de stock (Onhand_Stock) en orden ascendente
+critical_products = critical_products.sort_values(by='Onhand_Stock', ascending=True)
+
+# Seleccionar los 10 productos más críticos
+top_critical_products = critical_products.head(10)
+
+# Mostrar los resultados
+print(top_critical_products)
+
+# Exportar a CSV si es necesario
+top_critical_products.to_csv('TopCriticalProducts.csv', index=False)
+```
+
+```{python}
+# |  output: true
+# Configuración de estilo para Seaborn (opcional)
+sns.set(style="whitegrid")
+
+# Crear el gráfico de barras
+plt.figure(figsize=(10, 6))
+sns.barplot(
+    x='Onhand_Stock', 
+    y='Description',
+    data=top_critical_products, 
+    palette="Reds_r"
+)
+
+# Añadir etiquetas y título
+plt.title("Top 10 Productos Más Críticos por Nivel de Stock", fontsize=16)
+plt.xlabel("Stock Disponible", fontsize=12)
+plt.ylabel("Descripción del Producto", fontsize=12)
+
+# Ajustar el diseño para evitar recortes
+plt.tight_layout()
+
+# Mostrar el gráfico
+plt.show()
+```
+
+
