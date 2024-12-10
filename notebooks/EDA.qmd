@@ -121,21 +121,63 @@ print('sales duplicated: ')
 print(sales.duplicated().value_counts())
 ```
 
+# 🚀Optimizacion del control de inventario para BottleFlow Logistics
+> Un enfoque estratégico basado en datos #Supply Chain🚀
 
-## De la exploración de los datos podemos observar:
+## Descripción de la empresa
+BotterFlow Logistic es una distribuidora de bebidas alcohólicas que opera a nivel nacional en Estados Unidos. Nuestro objetivo es optimizar la gestión del inventario para abordar los desafíos que afectan nuestra eficiencia operativa.
+La empresa cuenta con una red logística robusta que le permite abastecer a supermercados, restaurantes, bares y tiendas especializadas en todo el país. Su catálogo incluye marcas nacionales e internacionales de renombre, lo que asegura vari
+variedad y calidad para satisfacer las necesidades de sus clientes.
+
+## Objetivos
+- Gestionar los niveles de inventario de manera eficaz en todas las categorías.
+- Optimizar los costos asociados al almacenamiento y la distribución de productos.
+- Integrar datos históricos y en tiempo real para decisiones más precisas.
+
+## Impacto
+- Aumento de la rentabilidad al evitar pérdidas relacionadas con la falta o el exceso de stock.
+- Mayor competitividad en el mercado al responder más eficientemente a las demandas del cliente, impulsando así las ventas.
+- Implementación de sistemas de previsión de demanda más precisos para ajustar los niveles de inventario a las necesidades reales.
+
+## Tecnologías utilizadas
+- Python
+- Power BI
+- SQL
+
+## Desafíos superados
+- Almacenamiento y consulta eficiente de grandes volúmenes de datos.
+- Diseño de bases de datos y optimización de consultas para mejorar el rendimiento.
+- Desarrollo de modelos de predicción y análisis de datos avanzados.
+- Automatización de tareas relacionadas con la limpieza, transformación y carga de datos desde excel, csv a SQL
+
+## Problema
+La empresa "BotterFlow Logistic" se especializa en la comercialización de licores. Actualmente, enfrenta problemas en el manejo de su stock debido a inconsistencias entre las cantidades registradas en su sistema y el inventario real en sus bodegas. Lo cual ha generado incumplimiento en pedidos; clientes mayoristas han solicitado productos que, según el sistema, están disponibles, pero al momento de preparar los pedidos se descubre que no hay suficiente stock. Otros productos permanecen en inventario más tiempo del esperado, aumentando costos de almacenamiento y el riesgo de expiración. Realización de pedidos innecesarios a proveedores o insuficientes para cubrir la demanda, afectando la rotación de productos.
+El equipo de gestión realiza un análisis de inventario para identificar áreas de mejora y optimizar sus prácticas de gestión de inventario.
+
+## Problemas identificados
+
+- **Sobrestock:** Exceso de inventario que genera costos innecesarios.  
+- **Stock vacío:** Carencia de productos que limita la capacidad de satisfacer la demanda de los clientes.  
+- **Incongruencia de los datos:** Falta e inconsistencia de los datos y adaptacion a herramientas para mayores volumenes de datos
+
+
+```{python}
+"""### De la exploración de los datos podemos observar:
 - Tanto inventario inicial como inventario final presentan las misma columnas.
 - Podemos observar que algunas tablas presentan valores faltantes.
 - El formato de fecha es diferente entre las tablas. La tabla "sales" tiene un formato m/d/yyyy, minetras las otras tablas presentan un formato yyyy/mm/dd
-- Se presentan inconsistencias en la columna "Size" de todas las tablas, ya que se utilizan diferentes unidades de medición.
-Por ejemplo, algunas tablas presentan un formato 750 mL, en otras Liter, en otras 1.75L, 375mL 2 Pk. Por tanto, es necesario unificar la unidad de medida.
+- Se presentan inconsistencias en la columna "Size" de todas las tablas, ya que se utilizan diferentes unidades de medición. Por ejemplo, algunas tablas presentan un formato 750 mL, en otras Liter, en otras 1.75L, 375mL 2 Pk. Por tanto, es necesario unificar la unidad de medida.
 - No hay valores duplicados.
+"""
+```
 
-## Manejo de valores faltantes:
+```{python}
+"""Manejo de valores faltantes:
 En el inventario final la columna "City" presenta 1284 valores faltantes de 224489 entradas. Si comparamos las columnas "InventoryId" de las tablas de inventario inicial y final, podemos ver que los valores faltantes de la columna "City" del inventario final, se correponden con la tienda 46.
 Esta tienda se indica como 46_TYWARDREATH en la columna "InventoryId" presente en la tabla de inventario inicail. Por lo tanto, podemos rellenar los valores faltantes de las filas de la columna "City" con el nombre TYWARDREATH. En la tabla compras, solo se presentan 3 vlaores faltantes en la columna "Size". Podemos eliminar estas filas o rellenarlas.
 En la tabla facturas de compra, se presentan 5169 valores faltantes de 5543 entradas. Son demasiados datos faltantes, por lo tanto podemos desestimar la columna y eliminarla.
-En la tabla precio de compra, solo hay 1 valor faltante en cada una de las columnas "Description", "Size" y "Volume". Podemos eliminar las filas con los datos faltantes. Además, la comlumna "Volume" indica lo mismo que la columna "Size" por lo que sería de utilidad eliminar dicha columna. También se elimina la columna "Volume" de la tabla ventas.
-
+En la tabla precio de compra, solo hay 1 valor faltante en cada una de las columnas "Description", "Size" y "Volume". Podemos eliminar las filas con los datos faltantes. Además, la comlumna "Volume" indica lo mismo que la columna "Size" por lo que sería de utilidad eliminar dicha columna. También se elimina la columna "Volume" de la tabla ventas."""
+```
 
 ```{python}
 # Manejo de datos faltantes
@@ -244,7 +286,6 @@ print(sales_f.head())
 ```
 
 ```{python}
-# |  output: true
 # Combinar las columnas "Size" de los DataFrames, ignorando las ausentes
 data_frames = [beg_inv_f, end_inv_f, purchases_f, purchase_prices_f, sales_f]
 all_sizes = pd.concat([df["Size"] for df in data_frames if "Size" in df.columns], ignore_index=True)
@@ -260,17 +301,17 @@ print(size_counts)
 
 pd.reset_option('display.max_rows')
 ```
-
-
-Podemos observar que hay 76 diferentes tipos de medidas para expresar el volumen.
-Se observan diferentes expresiones de medidas de volumen.
-- Para referenciar litro encontramos referencias como: Liter, L o l.
-- Se observan volúmenes expresados en Oz.
-- Hay otros patrones como 750mL, 375mL 2 Pk, 25.0, etc.
-Debemos estandarizar la medida de volume
-
 ```{python}
-# |  output: true
+"""
+Encontramos 76 diferentes tipos de medidas para expresar el volumen.
+Se observan diferentes expresiones de medidas de volumen.  
+- Para referenciar litro encontramos referencias como: Liter, L o l.  
+- Se observan volúmenes expresados en Oz.  
+- Hay otros patrones como 750mL, 375mL 2 Pk, 25.0, etc.  
+__Debemos estandarizar la medida de volume__
+"""
+```
+```{python}
 import re
 
 # Función para estandarizar las medidas de volumen en mililitros (mL)
@@ -339,8 +380,11 @@ for i, dataset in enumerate(datasets):
 En esta sección, analizaremos los parámetros fundamentales de la gestión de inventario y extraeremos información relevante sobre stock e inventario disponible.
 
 Se buscará:
+
 1. Detectar y analizar outliers.
+
 2. Visualizar la información de manera más clara.
+
 3. Agregar contexto relevante (proveedor, riesgo).
 
 ```{python}
@@ -384,7 +428,6 @@ La mayoría de los productos tienen un plazo de entrega promedio de aproximadame
 
 
 ```{python}
-# |  output: true
 # Clasificar productos según tiempo máximo de entrega
 def categorize_lead_time(max_lt):
     if max_lt <= 5:
@@ -399,9 +442,12 @@ LT_summary['Riesgo'] = LT_summary['Max_LT_inDays'].apply(categorize_lead_time)
 # Ver distribución de categorías de riesgo
 risk_distribution = LT_summary['Riesgo'].value_counts()
 print(risk_distribution)
-
+```
+```{python}
+# |  output: true
 # Gráfico de barras para distribución de riesgo
-risk_distribution.plot(kind='bar', color=['green', 'orange', 'red'], alpha=0.7)
+risk_distribution.plot(
+    kind='bar', color=['green', 'orange', 'red'], alpha=0.7, rot=0)
 plt.title("Distribución de Categorías de Riesgo")
 plt.xlabel("Categoría de Riesgo")
 plt.ylabel("Cantidad de Productos")
@@ -428,7 +474,8 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.show()
 ```
 
-Stock de seguridad e inventario disponible
+### Stock de seguridad e inventario disponible
+
 Como el stock de seguridad mide la cantidad de inventario de reserva que se debe tener, se debe determinar el stock de seguridad óptimo en función de la cantidad de ventas y la cantidad de stock de seguridad necesaria para que las ventas se realicen sin problemas.
 
 
@@ -513,7 +560,6 @@ Evaluar el inventario disponible.
 Se tendra en cuenta el inventario final, como inventario disponible.
 
 ```{python}
-# |  output: true
 # Analisis de inventario final disponible por marca
 # Filtrar inventario más reciente
 latest_onhand_inv = end_inv_f[end_inv_f['endDate'] == end_inv_f['endDate'].max()] \
@@ -531,7 +577,10 @@ onhand_inv_data['Inv_Shortage/Surplus'] = np.where(
 
 # Resumen de categorías
 print(onhand_inv_data['Inv_Shortage/Surplus'].value_counts())
+```
 
+```{python}
+# |  output: true
 # Visualización de estados del inventario
 fig, ax = plt.subplots(figsize=(11, 4))
 sns.boxplot(data=onhand_inv_data, x="Inv_Shortage/Surplus", y="Inventory_Status", ax=ax, palette="Set2")
@@ -548,7 +597,6 @@ plt.title("Distribución del Estado del Inventario")
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.show()
 ```
-
 
 El gráfico muestra que la empresa tiene un inventario excesivo de un 84% de sus productos, lo que le genera
 costos de mantenimiento de inventario sustanciales. Por otro lado, hay un 15% de déficit en el inventario.
@@ -567,12 +615,12 @@ beg_summary = beg_inv.groupby(['Brand', 'Description'])['onHand'].sum().reset_in
 end_summary = end_inv.groupby(['Brand', 'Description'])['onHand'].sum().reset_index().sort_values(by='onHand', ascending=False)
 
 # Identificar los 5 mejores productos al principio y al final del año
-top_5_beg = beg_summary.head(5)
-top_5_end = end_summary.head(5)
+top_5_beg = beg_summary.iloc[:5]
+top_5_end = end_summary.iloc[:5]
 
 # Identificar los 5 productos con peores resultados al principio y al final del año
-bottom_5_beg = beg_summary.tail(5)
-bottom_5_end = end_summary.tail(5)
+bottom_5_beg = beg_summary.iloc[-5:]
+bottom_5_end = end_summary.iloc[-5:]
 
 print("Top 5 productos al comienzo de año:\n", top_5_beg)
 print("\nTop 5 productos al final del año:\n", top_5_end)
@@ -581,7 +629,6 @@ print("\nPeores 5 productos al final del año:\n", bottom_5_end)
 ```
 
 ```{python}
-# |  output: true
 # Si graficamos esto:
 
 # Validar que los datos existan para cada subconjunto
@@ -629,26 +676,28 @@ if not top_5_beg.empty:
     plt.show()
 else:
     print("No hay datos suficientes para realizar los gráficos.")
-```
 
+"""
 Se puede observa que los últimos 2 gráficos están vacíos, esto se debe a que no hay existencias de dichos productos en el inventario, ya sea incial o final.
+"""
+```
 
 ## Analisis de productos más y menos vendidos.
 
 ```{python}
 # Encontrar los productos más vendidos
-best_selling_products = sales.groupby(['Brand', 'Description']).agg({'SalesQuantity': 'sum'}).sort_values(by='SalesQuantity', ascending=False).head(10)
+best_selling_products = sales.groupby(['Brand', 'Description']).agg({'SalesQuantity': 'sum'}).sort_values(by='SalesQuantity', ascending=False).iloc[:10]
 print(f"Los diez productos más vendidos:\n{best_selling_products}\n")
 
 # Encontrar los productos con menor movimiento
-slow_moving_products = sales.groupby(['Brand', 'Description']).agg({'SalesQuantity': 'sum'}).sort_values(by='SalesQuantity', ascending=True).head(10)
+slow_moving_products = sales.groupby(['Brand', 'Description']).agg({'SalesQuantity': 'sum'}).sort_values(by='SalesQuantity', ascending=True).iloc[:10]
 print(f"Diez productos de menor movimiento:\n{slow_moving_products}")
 ```
 
 ```{python}
 # |  output: true
 # Graficar los productos más vendidos
-fig, axes = plt.subplots(1, 2, figsize=(16, 6), gridspec_kw={'wspace': 0.4})
+fig, axes = plt.subplots(2, 1, figsize=(8, 12)) #, gridspec_kw={'wspace': 0.4})
 
 # Gráfico de los 10 productos más vendidos
 sns.barplot(
@@ -688,6 +737,14 @@ plt.show()
 # Análisis adicionales 
 
 ```{python}
+import matplotlib.ticker as ticker
+
+def millions_formatter(x, pos):
+    return f'US$ {x / 1e6:.0f} M'
+
+```
+
+```{python}
 # Calcular el importe total para beg_inv
 beg_inv["ImporteInicial"] = beg_inv["onHand"] * beg_inv["Price"]
 importe_total_inicial = beg_inv["ImporteInicial"].sum()
@@ -710,7 +767,7 @@ print(f"Diferencia entre inventarios: {diferencia:.2f}")
 best_purchased_products = purchases.groupby(['Brand', 'Description']).agg({
     'Quantity': 'sum',
     'Dollars': 'sum'  # Suponiendo que esta columna contiene el coste total de las compras
-}).sort_values(by='Quantity', ascending=False).head(10)
+}).sort_values(by='Quantity', ascending=False).iloc[:10]
 
 print(f"Los diez productos más comprados (con costo total):\n{best_purchased_products}\n")
 
@@ -718,7 +775,7 @@ print(f"Los diez productos más comprados (con costo total):\n{best_purchased_pr
 slow_moving_purchases = purchases.groupby(['Brand', 'Description']).agg({
     'Quantity': 'sum',
     'Dollars': 'sum'
-}).sort_values(by='Quantity', ascending=True).head(120)
+}).sort_values(by='Quantity', ascending=True).iloc[:120]
 
 print(f"Los 100 productos más comprados con menor movimiento (con costo total):\n{slow_moving_purchases}")
 ```
@@ -764,7 +821,6 @@ print(f"Importe total asociado a estos productos: ${total_amount:.2f}")
 ```
 
 ```{python}
-# |  output: true
 # Preparar datos para graficar
 products_quantity_one = products_quantity_one.reset_index()  # Restablecer índice para facilitar el acceso
 products_quantity_one = products_quantity_one.sort_values(by='Dollars', ascending=False)  # Ordenar por coste
@@ -790,9 +846,8 @@ plt.grid(axis='x', linestyle='--', alpha=0.6)
 # Mostrar el gráfico
 plt.tight_layout()
 plt.show()
+"""Podemos notar que el gráfico no es lo suficientemente claro, esto se debe a la cantidad de datos disponibles."""
 ```
-
-Podemos notar que el gráfico no es lo suficientemente claro, esto se debe a la cantidad de datos disponibles.
 
 ```{python}
 # Compras totales por mes:
@@ -892,6 +947,7 @@ plt.title('Comparación Mensual: Compras vs Ventas')
 plt.xlabel('Mes')
 plt.ylabel('Dólares')
 plt.legend()
+plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(millions_formatter))
 plt.grid(alpha=0.3)
 plt.xticks(rotation=45)
 plt.tight_layout()
@@ -902,7 +958,7 @@ plt.show()
 
 El gráfico muestra que las compras son mayores que las ventas durante varios meses consecutivos, esto podría significar que:
 
-- Se está adquiriendo más inventario del necesario.
+- Se está adquiriendo más inventario del necesario.  
 - Podría haber un problema de rotación de inventarios, lo que conllevaría a costos de almacenamiento elevados.
 
 
@@ -955,6 +1011,7 @@ else:
 
 ```{python}
 # |  output: true
+
 # Crear un DataFrame para las métricas clave
 data = {
     'Categoría': ['Compras Totales', 'Ventas Estimadas', 'Diferencia'],
@@ -964,7 +1021,7 @@ metrics_df = pd.DataFrame(data)
 
 # Configuración del gráfico
 plt.figure(figsize=(10, 6))
-sns.barplot(
+ax = sns.barplot(
     data=metrics_df, 
     x='Categoría', 
     y='Monto', 
@@ -973,19 +1030,32 @@ sns.barplot(
     palette=['skyblue', 'limegreen', 'tomato'],
     legend=False  # Evitamos agregar una leyenda extra
 )
-
+ax.yaxis.set_major_formatter(ticker.FuncFormatter(millions_formatter))
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
 # Etiquetas y personalización
 plt.title("Comparación: Compras Totales vs Ventas Estimadas vs Diferencia", fontsize=14, weight='bold', color='tomato')
-plt.ylabel("Monto en USD")
+plt.ylabel("Monto en Millones de Dólares")
 plt.xlabel("Categorías")
 plt.grid(axis='y', linestyle='--', alpha=0.6)
 
 # Agregar valores sobre las barras
 for i, value in enumerate(metrics_df['Monto']):
-    plt.text(i, value + (max(metrics_df['Monto']) * 0.02), f"${value:.2f}", ha='center', fontsize=11)
-
+    plt.text(
+        i,
+        value + (max(metrics_df['Monto']) * 0.02),
+        millions_formatter(value, None),
+        ha='center',
+        va='bottom',
+        fontsize=11,
+        fontweight='bold',
+        color='navy'
+    )
 # Mostrar el gráfico
 plt.tight_layout()
 plt.show()
 ```
 
+![](figures/powerbi_negativos.jpeg)
+
+Mediante el dashboard de PowerBI se evidencia el problema del exceso de botellas y su implicancia en las pérdidas de la empresa.
