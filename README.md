@@ -52,26 +52,98 @@ __Desafíos__ __superados:__
 - Automatización de tareas relacionadas con la limpieza, transformación y carga de datos desde excel,csv a SQL.
 
 
-## Características futuras: 
+## Análisis de inventario
 
-Prediccion de modelos que identifiquen las proximas tendencias para mejorar la planificacion de la demanda.
-Elaboracion de planes de mejora de procesos para mejorar la satisfaccion del consumidor.
+En esta sección, analizaremos los parámetros fundamentales de la gestión
+de inventario y extraeremos información relevante sobre stock e
+inventario disponible.
 
-DEPLOYMENT(Menciona cómo desplegar el proyecto y proporciona información sobre la versión
-actual y futuras)
+Se buscará:
 
+1.  Detectar y analizar outliers.
 
-ESTRUCTURA(Utiliza una estructura lógica y fácil de seguir, con subtítulos y secciones claras)
+2.  Visualizar la información de manera más clara.
 
-IMAGENES Y VIDEOS(Agrega imágenes y videos para ilustrar el funcionamiento y características
-del proyecto)
+3.  Agregar contexto relevante (proveedor, riesgo).
 
-CODIGO ( Incluye fragmentos de código relevantes y explique su función)
+![](figures/boxplot_entrega.png)
 
+El gráfico de caja muestra la distribución de los plazos de entrega
+promedio de los productos. La mayoría de los productos tienen un plazo
+de entrega promedio de aproximadamente 7 u 8 días, como lo muestra la
+distribución normal. Por lo tanto, la mayoría de los vendedores entregan
+los productos en el plazo de una semana.
 
-TABLA DE CONTENIDOS(Incluye una tabla de contenidos para facilitar la navegación en el
-README)
+![](figures/categorias_riesgo.png)
 
+![](figures/desviacion_estandar_tiempo_de_entrega.png)
+
+### Stock de seguridad e inventario disponible
+
+Como el stock de seguridad mide la cantidad de inventario de reserva que
+se debe tener, se debe determinar el stock de seguridad óptimo en
+función de la cantidad de ventas y la cantidad de stock de seguridad
+necesaria para que las ventas se realicen sin problemas.
+
+![](figures/ventas_promedio_dia.png)
+
+![](figures/stock_de_seguridad.png)
+
+Los histogramas representan el recuento de stock de seguridad requerido
+para cada marca junto con sus ventas diarias promedio. Sin embargo,
+debido a que los datos están muy sesgados hacia la izquierda, la
+distribución de los puntos de datos en el lado derecho no es claramente
+visible. Para poder visualizar esto mejor, utilizaremos un diagrama de
+caja.
+
+![](figures/stock_seguro.png)
+
+Como podemos observar, la mayoría de los productos requieren un stock de
+seguridad de entre cero y 200. Sin embargo, el diagrama de caja muestra
+que algunos productos necesitan hasta 3500 unidades en existencias de
+seguridad.
+
+Evaluar el inventario disponible. Se tendra en cuenta el inventario
+final, como inventario disponible.
+
+![](figures/estado_del_inventario.png)
+
+El gráfico muestra que la empresa tiene un inventario excesivo de un 84%
+de sus productos, lo que le genera costos de mantenimiento de inventario
+sustanciales. Por otro lado, hay un 15% de déficit en el inventario. De
+hecho, solo un 1% del inventario presenta un stock equilibrado.
+
+La empresa debe abordar este problema reduciendo el excedente de
+inventario y cubriendo los faltantes de inventario para mantener el
+equilibrio.
+
+## Analisis de productos más y menos vendidos.
+
+![](figures/comparativa_ventas_productos.png)
+
+# Análisis adicionales
+
+![](figures/comparativa_mensual_ventas_compras.png)
+
+El gráfico muestra que las compras son mayores que las ventas durante
+varios meses consecutivos, esto podría significar que:
+
+- Se está adquiriendo más inventario del necesario.  
+- Podría haber un problema de rotación de inventarios, lo que
+  conllevaría a costos de almacenamiento elevados.
+
+Si las ventas son mayores que las compras en la mayoría de los meses:
+
+- Esto podría ser positivo, mostrando una buena utilización del
+  inventario, pero es importante monitorear para evitar quedarse sin
+  existencias.
+
+![](figures/diferencia_entre_compras_ventas.png)
+
+![](figures/powerbi_negativos.jpeg)
+
+Mediante el dashboard de PowerBI se evidencia el problema del exceso de
+botellas y su implicancia en las pérdidas de la empresa.
 
 ## Autores
 - [X] Lucel Da Silva
@@ -79,58 +151,3 @@ README)
 - [X] Katia Berrios
 - [X] Roberto Gil
 - [X] Jeniffer Caballero
-
-
-TABLA DE CONTENIDOS(Incluye una tabla de contenidos para facilitar la navegación en el
-README)
-
-
-# Descripcion
-
-BottleFlow Logistics es una distribuidora de bebidas alcoholicas.  
-Distribuimos distintas presentaciones a lo largo del anho.
-Cuyo proble a es el sobrestock, stock vacio.
-
-Objetivos:
--Gestionar los niveles de inventario de manera eficaz en todas las categorías.
--Identificar las pautas de la demanda para reducir al mínimo las carencia de stock.
--Crear planes de acción basados en conocimientos basados en datos.
-
-El Impacto que queremos generar:
--Reducción del desperdicio de productos.
--Mejora de la eficiencia operativa.
--Aumentar el beneficio economico.
-
-Tecnologias utilizadas: Python, Power BI, SQL 
-
-desafios superados: Limpieza de datos ,
-
-caracteristicas futuras: 
-
-Prediccion de modelos que identifiquen las proximas tendencias para mejorar la planificacion de la demanda.
-Elaboracion de planes de mejora de procesos para mejorar la satisfaccion del consumidor.
-
-###DEPLOYMENT(Menciona cómo desplegar el proyecto y proporciona información sobre la versión
-actual y futuras)
-
-
-###ESTRUCTURA Y FUNCIONALIDADES (Utiliza una estructura lógica y fácil de seguir, con subtítulos y secciones claras)
-
-
-
-###CODIGO ( Incluye fragmentos de código relevantes y explique su función)
-
-###RECURSOS ADICIONALES (Enlaces a recursos adicionales, como documentacion tecnica, o wiki del proyecto)
-
-
-###IMAGENES Y VIDEOS/AENXOS(Agrega imágenes y videos para ilustrar el funcionamiento y características
-del proyecto)
-
-
-
-
-
-
-
-
-
