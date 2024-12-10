@@ -41,7 +41,7 @@ Consciente de la necesidad de modernizarse, BottleFlow Logistics ha decidido con
 
 
 ## Tecnologías utilizadas
-- Python
+- Python python 
 - Power BI
 - SQL 
 
