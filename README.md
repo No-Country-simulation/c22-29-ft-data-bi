@@ -2,31 +2,43 @@
 🚀Análisis de inventario de BottleFlow Logistics #Supply Chain🚀
 
 
-# Descripcion
+# Descripción
 
-BottleFlow Logistics es una distribuidora de bebidas alcoholicas.  
-Distribuimos distintas presentaciones a lo largo del anho.
+**BottleFlow** **Logistics** es una destacada empresa distribuidora de bebidas alcohólicas en los Estados Unidos, reconocida por abastecer a supermercados, restaurantes, bares y tiendas especializadas en todo el país. A pesar de su éxito comercial, la compañía opera con un modelo de gestión tradicional que limita su capacidad para aprovechar el valor de los datos en la toma de decisiones estratégicas.
 
-__PROBLEMA:__ sobre stock, stock vacio.
+
+
+__PROBLEMA:__ 
+
+La dirección, basándose en su amplia experiencia en el sector, ha identificado varios desafíos operativos, siendo uno de los más críticos la gestión ineficiente de su stock. Este problema no solo afecta el flujo de distribución, sino que también podría limitar la capacidad de la empresa para competir eficazmente en un mercado cada vez más dinámico y digitalizado.
+
+Consciente de la necesidad de modernizarse, BottleFlow Logistics ha decidido contratar una consultora externa, **"Soluciones Barichara"**, especializada en datos y tecnología. El objetivo es implementar un sistema de gestión de datos más eficiente y desarrollar un análisis profundo de sus operaciones para identificar y solucionar problemas clave. Este proyecto tiene como propósito optimizar sus procesos internos, mejorar la gestión de inventarios y sentar las bases para un crecimiento sostenible y competitivo en el futuro.
 
 # Objetivos:
 - Gestionar los niveles de inventario de manera eficaz en todas las categorías.
-- Identificar las pautas de la demanda para reducir al mínimo las carencia de stock.
-- Crear planes de acción basados en conocimientos basados en datos.
+- Optimizar los costos asociados al almacenamiento y la distribución de productos.
+- Integrar datos históricos y en tiempo real para decisiones más precisas.
+
 
 # Impacto:
-- Reducción de los desperdicio de productos.
-- Mejora de la eficiencia operativa.
-- Aumentar el capital economico.
+- Aumento de la rentabilidad al evitar pérdidas relacionadas con la falta o el exceso de stock.
+- Mayor competitividad en el mercado al responder más eficientemente a las demandas del cliente, impulsando así las ventas.
+- Implementación de sistemas de previsión de demanda más precisos para ajustar los niveles de inventario a las necesidades reales.
 
-## Tecnologias utilizadas
+
+## Tecnologías utilizadas
 - Python
 - Power BI
 - SQL 
 
-__Desafios__ __superados:__ Limpieza de datos 
+__Desafíos__ __superados:__ 
+- Almacenamiento y consulta eficiente de grandes volúmenes de datos.
+- Diseño de bases de datos y optimización de consultas para mejorar el rendimiento.
+- Desarrollo de modelos de predicción y análisis de datos avanzados.
+- Automatización de tareas relacionadas con la limpieza, transformación y carga de datos desde excel,csv a SQL.
 
-## Caracteristicas futuras: 
+
+## Características futuras: 
 
 Prediccion de modelos que identifiquen las proximas tendencias para mejorar la planificacion de la demanda.
 Elaboracion de planes de mejora de procesos para mejorar la satisfaccion del consumidor.
