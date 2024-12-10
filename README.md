@@ -1,13 +1,21 @@
-# 🚀Optimizacion del control de inventario para BottleFlow Logistics:Un enfoque estratégico basado en datos #Supply Chain🚀
+<div style="text-align: justify">
+
+# 🚀Optimización del control de inventario para BottleFlow Logistics: un enfoque estratégico basado en datos #Supply Chain🚀
+
+</div>
+
+<div style="text-align: justify">
 
 # Descripción
 
 **BottleFlow** **Logistics** es una destacada empresa distribuidora de bebidas alcohólicas en los Estados Unidos, reconocida por abastecer a supermercados, restaurantes, bares y tiendas especializadas en todo el país. A pesar de su éxito comercial, la compañía opera con un modelo de gestión tradicional que limita su capacidad para aprovechar el valor de los datos en la toma de decisiones estratégicas.
 
+</div>
+
 
 
 __PROBLEMA:__ 
-
+<div style="text-align: justify">
 Introducción
 
 Imagine ser el cerebro detrás de estantes mayoristas  más inteligentes, donde cada producto tiene su momento, se minimiza el desperdicio o perdidas y los clientes siempre encuentran lo que necesitan. Ese es el objetivo de este proyecto! Juntos, nos estamos sumergiendo en un desafío del mundo real: ** predecir la demanda de inventario para transformar cómo funcionan las cadenas de suministro**
@@ -17,8 +25,7 @@ La dirección, basándose en su amplia experiencia en el sector, ha identificado
 
 Consciente de la necesidad de modernizarse, BottleFlow Logistics ha decidido contratar una consultora externa, **"Soluciones Barichara"**, especializada en datos y tecnología. El objetivo es implementar un sistema de gestión de datos más eficiente y desarrollar un análisis profundo de sus operaciones para identificar y solucionar problemas clave. Este proyecto tiene como propósito optimizar sus procesos internos, mejorar la gestión de inventarios y sentar las bases para un crecimiento sostenible y competitivo en el futuro.
 
-
-__PROBLEMA:__ sobre stock, stock vacio.
+</div>
 
 
 # Objetivos:
