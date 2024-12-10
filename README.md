@@ -7,6 +7,7 @@
 <div style="text-align: justify">
 
 # Descripción
+Imagine ser el cerebro detrás de estantes mayoristas más inteligentes, donde cada producto tiene su momento, se minimiza el desperdicio o perdidas y los clientes siempre encuentran lo que necesitan. Ese es el objetivo de este proyecto! Juntos, nos estamos sumergiendo en un desafío del mundo real: predecir la demanda de inventario para transformar cómo funcionan las cadenas de suministro.
 
 **BottleFlow** **Logistics** es una destacada empresa distribuidora de bebidas alcohólicas en los Estados Unidos, reconocida por abastecer a supermercados, restaurantes, bares y tiendas especializadas en todo el país. A pesar de su éxito comercial, la compañía opera con un modelo de gestión tradicional que limita su capacidad para aprovechar el valor de los datos en la toma de decisiones estratégicas.
 
@@ -15,11 +16,14 @@
 
 
 __PROBLEMA:__ 
+<<<<<<< HEAD
 <div style="text-align: justify">
 Introducción
 
 Imagine ser el cerebro detrás de estantes mayoristas  más inteligentes, donde cada producto tiene su momento, se minimiza el desperdicio o perdidas y los clientes siempre encuentran lo que necesitan. Ese es el objetivo de este proyecto! Juntos, nos estamos sumergiendo en un desafío del mundo real: ** predecir la demanda de inventario para transformar cómo funcionan las cadenas de suministro**
 
+=======
+>>>>>>> 8dc2828 (avance de intro)
 
 La dirección, basándose en su amplia experiencia en el sector, ha identificado varios desafíos operativos, siendo uno de los más críticos la gestión ineficiente de su stock. Este problema no solo afecta el flujo de distribución, sino que también podría limitar la capacidad de la empresa para competir eficazmente en un mercado cada vez más dinámico y digitalizado.
 
@@ -151,3 +155,60 @@ botellas y su implicancia en las pérdidas de la empresa.
 - [X] Katia Berrios
 - [X] Roberto Gil
 - [X] Jeniffer Caballero
+<<<<<<< HEAD
+=======
+
+
+TABLA DE CONTENIDOS(Incluye una tabla de contenidos para facilitar la navegación en el
+README)
+
+
+# Descripcion
+
+BottleFlow Logistics es una distribuidora de bebidas alcoholicas.  
+Distribuimos distintas presentaciones a lo largo del anho.
+Cuyo proble a es el sobrestock, stock vacio.
+
+Objetivos:
+-Gestionar los niveles de inventario de manera eficaz en todas las categorías.
+-Identificar las pautas de la demanda para reducir al mínimo las carencia de stock.
+-Crear planes de acción basados en conocimientos basados en datos.
+
+El Impacto que queremos generar:
+-Reducción del desperdicio de productos.
+-Mejora de la eficiencia operativa.
+-Aumentar el beneficio economico.
+
+Tecnologias utilizadas: Python, Power BI, SQL 
+
+desafios superados: Limpieza de datos ,
+
+caracteristicas futuras: 
+
+Prediccion de modelos que identifiquen las proximas tendencias para mejorar la planificacion de la demanda.
+Elaboracion de planes de mejora de procesos para mejorar la satisfaccion del consumidor.
+
+
+
+
+###ESTRUCTURA Y FUNCIONALIDADES (Utiliza una estructura lógica y fácil de seguir, con subtítulos y secciones claras)
+
+
+
+###CODIGO ( Incluye fragmentos de código relevantes y explique su función)
+
+###RECURSOS ADICIONALES (Enlaces a recursos adicionales, como documentacion tecnica, o wiki del proyecto)
+
+
+###IMAGENES Y VIDEOS/AENXOS(Agrega imágenes y videos para ilustrar el funcionamiento y características
+del proyecto)
+
+
+
+
+
+
+
+
+
+>>>>>>> 8dc2828 (avance de intro)
