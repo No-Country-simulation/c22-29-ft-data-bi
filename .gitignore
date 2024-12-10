@@ -7,7 +7,7 @@
 
 # Quarto and Project Config
 _quarto.yml
-./.quarto
+.quarto/
 */presentacion/
 *_files/
 
