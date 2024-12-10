@@ -16,14 +16,9 @@ Imagine ser el cerebro detrás de estantes mayoristas más inteligentes, donde c
 
 
 __PROBLEMA:__ 
-<<<<<<< HEAD
+
 <div style="text-align: justify">
-Introducción
-
 Imagine ser el cerebro detrás de estantes mayoristas  más inteligentes, donde cada producto tiene su momento, se minimiza el desperdicio o perdidas y los clientes siempre encuentran lo que necesitan. Ese es el objetivo de este proyecto! Juntos, nos estamos sumergiendo en un desafío del mundo real: ** predecir la demanda de inventario para transformar cómo funcionan las cadenas de suministro**
-
-=======
->>>>>>> 8dc2828 (avance de intro)
 
 La dirección, basándose en su amplia experiencia en el sector, ha identificado varios desafíos operativos, siendo uno de los más críticos la gestión ineficiente de su stock. Este problema no solo afecta el flujo de distribución, sino que también podría limitar la capacidad de la empresa para competir eficazmente en un mercado cada vez más dinámico y digitalizado.
 
@@ -155,7 +150,6 @@ botellas y su implicancia en las pérdidas de la empresa.
 - [X] Katia Berrios
 - [X] Roberto Gil
 - [X] Jeniffer Caballero
-<<<<<<< HEAD
 =======
 
 
@@ -208,7 +202,3 @@ del proyecto)
 
 
 
-
-
-
->>>>>>> 8dc2828 (avance de intro)
