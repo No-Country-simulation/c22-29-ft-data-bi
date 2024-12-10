@@ -1,4 +1,4 @@
-# 🚀Análisis de inventario de BottleFlow Logistics #Supply Chain🚀
+# 🚀Optimizacion del control de inventario para BottleFlow Logistics:Un enfoque estratégico basado en datos #Supply Chain🚀
 
 # Descripción
 
