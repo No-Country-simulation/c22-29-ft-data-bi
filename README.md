@@ -41,7 +41,8 @@ Consciente de la necesidad de modernizarse, BottleFlow Logistics ha decidido con
 - Python ![icons8-python-20](https://github.com/user-attachments/assets/282b2a63-50e8-4eed-aa8b-d9b51db236fe)
 - Power BI ![icons8-power-bi-2021-20](https://github.com/user-attachments/assets/0c7da127-402a-40da-8b1e-da47785aa8fc)
 - SQL ![icons8-sql-20](https://github.com/user-attachments/assets/aa202c48-0bc3-42dd-848f-f60228a74f8e)
-- Google Cloud
+- Google Cloud ![icons8-nube-de-google-20](https://github.com/user-attachments/assets/6f0a2865-818c-48f2-a6c0-1143fc1311d3)
+
 
 __Desafíos__ __superados:__ 
 - Almacenamiento y consulta eficiente de grandes volúmenes de datos.
