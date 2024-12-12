@@ -690,18 +690,17 @@ best_selling_products = sales.groupby(['Brand', 'Description']).agg({'SalesQuant
 print(f"Los diez productos más vendidos:\n{best_selling_products}\n")
 
 # Encontrar los productos con menor movimiento
-slow_moving_products = sales.groupby(['Brand', 'Description']).agg({'SalesQuantity': 'sum'}).sort_values(by='SalesQuantity', ascending=True).iloc[:10]
+slow_moving_products = sales.groupby(['Brand', 'Description']).agg({'SalesQuantity': 'sum'}).sort_values(by='SalesQuantity', ascending=True)
+#.iloc[:10]
 print(f"Diez productos de menor movimiento:\n{slow_moving_products}")
 ```
 
 ```{python}
 # |  output: true
 # Graficar los productos más vendidos
-fig, axes = plt.subplots(2, 1, figsize=(8, 12)) #, gridspec_kw={'wspace': 0.4})
+fig = plt.figure(figsize=(8, 6))
 
-# Gráfico de los 10 productos más vendidos
 sns.barplot(
-    ax=axes[0], 
     data=best_selling_products.reset_index(), 
     x='SalesQuantity', 
     y='Description', 
@@ -709,28 +708,40 @@ sns.barplot(
     dodge=False, 
     palette='viridis'
 )
-axes[0].set_title("Top 10 Productos Más Vendidos")
-axes[0].set_xlabel("Cantidad Vendida")
-axes[0].set_ylabel("Producto")
-axes[0].legend(title="Marca", loc='lower right')
 
-# Gráfico de los 10 productos de menor movimiento
-sns.barplot(
-    ax=axes[1], 
-    data=slow_moving_products.reset_index(), 
-    x='SalesQuantity', 
-    y='Description', 
-    hue='Brand', 
-    dodge=False, 
-    palette='magma'
-)
-axes[1].set_title("Top 10 Productos de Menor Movimiento")
-axes[1].set_xlabel("Cantidad Vendida")
-axes[1].set_ylabel("Producto")
-axes[1].legend(title="Marca", loc='lower right')
+plt.title("Top 10 Productos Más Vendidos")
+plt.xlabel("Cantidad Vendida")
+plt.ylabel("Producto")
+plt.legend(title="Marca", loc='lower right')
 
-# Título general
-plt.suptitle("Comparación: Productos Más Vendidos vs Menos Vendidos", fontsize=16, weight='bold', color='tomato')
+# Mostrar el gráfico
+plt.show()
+```
+
+```{python}
+# |  output: true
+
+slow_moving_products['Category'] = slow_moving_products['SalesQuantity'].apply(lambda x: 'Se vendieron\n5 unidades\no menos' if x <=5 else 'Se vendieron\nmás de\n5 unidades')
+
+summary = slow_moving_products.groupby('Category').size().reset_index(name='Count')
+
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.pie(
+    summary['Count'], 
+    labels=summary['Category'], 
+    autopct='%1.0f%%', 
+    startangle=90, 
+    colors=['skyblue', 'orange'], 
+    wedgeprops={'width': 0.7},
+    textprops={'fontsize': 14})
+
+total = len(slow_moving_products['Category'])
+
+ax.text(0, 0, f'{total}\nproductos', 
+        ha='center', va='center', fontsize=14)
+
+# Título del gráfico
+plt.title('Productos con menor movimiento', fontsize=16)
 plt.show()
 ```
 
@@ -1011,7 +1022,6 @@ else:
 
 ```{python}
 # |  output: true
-
 # Crear un DataFrame para las métricas clave
 data = {
     'Categoría': ['Compras Totales', 'Ventas Estimadas', 'Diferencia'],
