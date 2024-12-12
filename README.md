@@ -122,7 +122,10 @@ equilibrio.
 
 ## Analisis de productos más y menos vendidos.
 
-![](figures/comparativa_ventas_productos.png)
+![](figures/productos_mas_vendidos.png)
+
+
+![](figures/productos_con_menor_movimiento.png)
 
 # Análisis adicionales
 
