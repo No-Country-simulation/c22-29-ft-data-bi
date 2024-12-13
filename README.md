@@ -105,7 +105,6 @@ Si las ventas son mayores que las compras en la mayoría de los meses:
   inventario, pero es importante monitorear para evitar quedarse sin
   existencias.
 
-![](figures/diferencia_entre_compras_ventas.png)
 
 ![](figures/powerbi_negativos.jpeg)
 
