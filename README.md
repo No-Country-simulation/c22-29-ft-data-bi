@@ -69,45 +69,6 @@ Se buscará:
 
 3.  Agregar contexto relevante (proveedor, riesgo).
 
-![](figures/boxplot_entrega.png)
-
-El gráfico de caja muestra la distribución de los plazos de entrega
-promedio de los productos. La mayoría de los productos tienen un plazo
-de entrega promedio de aproximadamente 7 u 8 días, como lo muestra la
-distribución normal. Por lo tanto, la mayoría de los vendedores entregan
-los productos en el plazo de una semana.
-
-![](figures/categorias_riesgo.png)
-
-![](figures/desviacion_estandar_tiempo_de_entrega.png)
-
-### Stock de seguridad e inventario disponible
-
-Como el stock de seguridad mide la cantidad de inventario de reserva que
-se debe tener, se debe determinar el stock de seguridad óptimo en
-función de la cantidad de ventas y la cantidad de stock de seguridad
-necesaria para que las ventas se realicen sin problemas.
-
-![](figures/ventas_promedio_dia.png)
-
-![](figures/stock_de_seguridad.png)
-
-Los histogramas representan el recuento de stock de seguridad requerido
-para cada marca junto con sus ventas diarias promedio. Sin embargo,
-debido a que los datos están muy sesgados hacia la izquierda, la
-distribución de los puntos de datos en el lado derecho no es claramente
-visible. Para poder visualizar esto mejor, utilizaremos un diagrama de
-caja.
-
-![](figures/stock_seguro.png)
-
-Como podemos observar, la mayoría de los productos requieren un stock de
-seguridad de entre cero y 200. Sin embargo, el diagrama de caja muestra
-que algunos productos necesitan hasta 3500 unidades en existencias de
-seguridad.
-
-Evaluar el inventario disponible. Se tendra en cuenta el inventario
-final, como inventario disponible.
 
 ![](figures/estado_del_inventario.png)
 
